@@ -77,7 +77,7 @@ analytes:
     threshold: 50
     threshold_type: MCL
     phg: null
-    aliases: ["Chromium", "Total chromium", "Chromium (total)", total"]
+    aliases: ["Chromium", "Total chromium", "Chromium (total)"]
   - id: barium
     name: Barium
     group: inorganic
@@ -184,7 +184,7 @@ analytes:
     threshold: 15
     threshold_type: MCL
     phg: 0
-    aliases: ["Gross alpha", "Gross alpha particle activity", "Alpha, gross"]
+    aliases: ["Gross alpha", "Gross alpha particle activity", "Gross alpha activity"]
   - id: uranium
     name: Uranium
     group: radiological
@@ -225,7 +225,7 @@ analytes:
     threshold: 50
     threshold_type: MCL
     phg: 0
-    aliases: ["Gross beta", "Gross beta particle activity", "Beta, gross"]
+    aliases: ["Gross beta", "Gross beta particle activity", "Gross beta activity"]
     notes: "MCL is 4 mrem/yr; the state screening level is 50 pCi/L."
   - id: radon
     name: Radon
@@ -356,7 +356,7 @@ analytes:
     threshold: 5
     threshold_type: MCL
     phg: 0.7
-    aliases: ["1, 2, 3-Trichloropropane", 3-TCP", "123-TCP", "TCP"]
+    aliases: ["1,2,3-Trichloropropane", "1,2,3-TCP", "123-TCP", "TCP"]
   - id: tce
     name: Trichloroethylene (TCE)
     group: organic
@@ -380,7 +380,7 @@ analytes:
     threshold: 6
     threshold_type: MCL
     phg: 10
-    aliases: ["1, 1-Dichloroethylene", 1-DCE", 1-Dichloroethene"]
+    aliases: ["1,1-Dichloroethylene", "1,1-DCE", "1,1-Dichloroethene"]
   - id: dce_cis_12
     name: cis-1,2-Dichloroethylene
     group: organic
@@ -388,7 +388,7 @@ analytes:
     threshold: 6
     threshold_type: MCL
     phg: 13
-    aliases: ["cis-1, 2-Dichloroethylene", 2-DCE", 2-Dichloroethene"]
+    aliases: ["cis-1,2-Dichloroethylene", "cis-1,2-DCE", "cis-1,2-Dichloroethene"]
   - id: carbon_tetrachloride
     name: Carbon tetrachloride
     group: organic
@@ -420,7 +420,7 @@ analytes:
     threshold: 200
     threshold_type: MCL
     phg: 3
-    aliases: ["DBCP", "1, 2-Dibromo-3-chloropropane", "Dibromochloropropane"]
+    aliases: ["DBCP", "1,2-Dibromo-3-chloropropane", "Dibromochloropropane"]
   - id: atrazine
     name: Atrazine
     group: organic
@@ -460,7 +460,7 @@ analytes:
     threshold: 1
     threshold_type: NL
     phg: null
-    aliases: ["1, 4-Dioxane", 4 Dioxane"]
+    aliases: ["1,4-Dioxane", "1,4 Dioxane"]
   - id: tba
     name: tert-Butyl alcohol (TBA)
     group: organic
@@ -723,7 +723,7 @@ analytes:
     threshold: null
     threshold_type: NONE
     phg: null
-    aliases: [Alkalinity, "Total alkalinity", "Alkalinity (as CaCO3)", total"]
+    aliases: [Alkalinity, "Total alkalinity", "Alkalinity (as CaCO3)"]
   - id: bicarbonate
     name: Bicarbonate
     group: general
