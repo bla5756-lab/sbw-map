@@ -1,0 +1,1211 @@
+# SDWIS laboratory-results analyte mapping for southbay-water.
+#
+# One entry per Analyte Code ("STORET"-style code, column "Analyte Code") that appears in the
+# Santa Clara County rows of the State Water Board EDT library files (SDWIS4.tab / SDWIS5.tab).
+# Generated from the data and then assigned by hand; src/pipeline/sdwis_extract.py reads it.
+#
+# Fields
+#   storet      Analyte Code exactly as in the file (string; some codes start with a letter)
+#   raw_name    Analyte Name as spelled in the file (trailing padding removed)
+#   unit        Units of Measure seen in the data for this code (informational; the extract keeps
+#               the unit each row carries and never converts)
+#   id          canonical id from config/analytes.yaml, or null when the catalogue has no entry
+#   unit_label  optional. When set, the extract reports this string as the unit instead of the
+#               one in the data, e.g. "MG/L as NO3" if a nitrate code ever turns out to be
+#               reported as NO3 rather than as N. Not needed for the current data: code 1040
+#               NITRATE carries MCL 10 / DLR 0.4, i.e. it is reported as N.
+#   notes       free text
+#
+# Matching: the extract matches on storet first; if a row's code is not listed it falls back to
+# the raw_name (case-insensitive, trimmed). Unlisted analytes are kept with id null.
+#
+# Catalogue analytes with no SDWIS rows for these systems (so no entry here): chlorine_residual,
+# chloramines, total_coliform, e_coli, heterotrophic_bacteria, radon, molybdenum, ndma, nmor,
+# pfas_total.
+analytes:
+- storet: '0100'
+  raw_name: TURBIDITY
+  unit: NTU
+  id: turbidity
+- storet: '1002'
+  raw_name: ALUMINUM
+  unit: UG/L
+  id: aluminum
+- storet: '1003'
+  raw_name: NITROGEN-AMMONIA AS (N)
+  unit: MG/L
+  id: null
+- storet: '1004'
+  raw_name: BROMIDE
+  unit: MG/L
+  id: null
+- storet: '1005'
+  raw_name: ARSENIC
+  unit: UG/L
+  id: arsenic
+- storet: '1007'
+  raw_name: CHLORATE
+  unit: UG/L
+  id: chlorate
+- storet: '1009'
+  raw_name: CHLORITE
+  unit: MG/L
+  id: chlorite
+- storet: '1010'
+  raw_name: BARIUM
+  unit: UG/L
+  id: barium
+  notes: UG/L in the data; catalogue unit is ppm.
+- storet: '1011'
+  raw_name: BROMATE
+  unit: UG/L
+  id: bromate
+- storet: '1015'
+  raw_name: CADMIUM
+  unit: UG/L
+  id: cadmium
+- storet: '1017'
+  raw_name: CHLORIDE
+  unit: MG/L
+  id: chloride
+- storet: '1020'
+  raw_name: CHROMIUM
+  unit: UG/L
+  id: chromium_total
+- storet: '1021'
+  raw_name: HYDROXIDE AS CALCIUM CARBONATE
+  unit: MG/L
+  id: null
+- storet: '1022'
+  raw_name: COPPER, FREE
+  unit: UG/L
+  id: copper
+  notes: '"COPPER, FREE" is the Lead and Copper Rule tap-sample copper code. UG/L in the data (catalogue ppm); individual
+    results, not a 90th percentile.'
+- storet: '1024'
+  raw_name: CYANIDE
+  unit: UG/L
+  id: cyanide
+- storet: '1025'
+  raw_name: FLUORIDE
+  unit: MG/L
+  id: fluoride
+- storet: '1028'
+  raw_name: IRON
+  unit: UG/L
+  id: iron
+- storet: '1030'
+  raw_name: LEAD
+  unit: UG/L
+  id: lead
+  notes: Individual Lead and Copper Rule tap-sample results, not a 90th percentile.
+- storet: '1031'
+  raw_name: MAGNESIUM
+  unit: MG/L
+  id: magnesium
+- storet: '1032'
+  raw_name: MANGANESE
+  unit: UG/L
+  id: manganese
+- storet: '1035'
+  raw_name: MERCURY
+  unit: UG/L
+  id: mercury
+- storet: '1036'
+  raw_name: NICKEL
+  unit: UG/L
+  id: nickel
+- storet: '1037'
+  raw_name: TOTAL KJELDAHL NITROGEN (IN WATER MG/L)
+  unit: MG/L
+  id: null
+- storet: '1038'
+  raw_name: NITRATE-NITRITE
+  unit: MG/L
+  id: null
+  notes: Nitrate + nitrite as N; no catalogue entry. Deliberately not folded into nitrate_n.
+- storet: '1039'
+  raw_name: PERCHLORATE
+  unit: UG/L
+  id: perchlorate
+- storet: '1040'
+  raw_name: NITRATE
+  unit: MG/L
+  id: nitrate_n
+  notes: 'Reported as N: the file carries MCL 10 and DLR 0.4 for this code (as NO3 would be 45 / 2), so no unit_label
+    override is needed.'
+- storet: '1041'
+  raw_name: NITRITE
+  unit: MG/L
+  id: nitrite_n
+- storet: '1042'
+  raw_name: POTASSIUM
+  unit: MG/L
+  id: potassium
+- storet: '1044'
+  raw_name: ORTHOPHOSPHATE
+  unit: MG/L
+  id: null
+- storet: '1045'
+  raw_name: SELENIUM
+  unit: UG/L
+  id: selenium
+- storet: '1049'
+  raw_name: SILICA
+  unit: MG/L
+  id: silica
+- storet: '1050'
+  raw_name: SILVER
+  unit: UG/L
+  id: silver
+- storet: '1051'
+  raw_name: STRONTIUM
+  unit: UG/L
+  id: strontium
+- storet: '1052'
+  raw_name: SODIUM
+  unit: MG/L
+  id: sodium
+- storet: '1055'
+  raw_name: SULFATE
+  unit: MG/L
+  id: sulfate
+- storet: '1064'
+  raw_name: CONDUCTIVITY @ 25 C UMHOS/CM
+  unit: UMHO/CM
+  id: specific_conductance
+  notes: UMHO/CM in the data = uS/cm.
+- storet: '1074'
+  raw_name: ANTIMONY, TOTAL
+  unit: UG/L
+  id: antimony
+- storet: '1075'
+  raw_name: BERYLLIUM, TOTAL
+  unit: UG/L
+  id: beryllium
+- storet: '1079'
+  raw_name: BORON, TOTAL
+  unit: UG/L
+  id: boron
+- storet: '1080'
+  raw_name: CHROMIUM, HEX
+  unit: UG/L
+  id: chromium_6
+- storet: '1083'
+  raw_name: LITHIUM, TOTAL
+  unit: UG/L
+  id: lithium
+- storet: '1085'
+  raw_name: THALLIUM, TOTAL
+  unit: UG/L
+  id: thallium
+- storet: '1088'
+  raw_name: VANADIUM, TOTAL
+  unit: UG/L
+  id: vanadium
+- storet: '1094'
+  raw_name: ASBESTOS
+  unit: MFL
+  id: asbestos
+- storet: '1095'
+  raw_name: ZINC
+  unit: UG/L
+  id: zinc
+  notes: UG/L in the data; catalogue unit is ppm.
+- storet: '1901'
+  raw_name: CARBON DIOXIDE
+  unit: UG/L
+  id: null
+- storet: '1902'
+  raw_name: CARBON DISULFIDE
+  unit: UG/L
+  id: null
+- storet: '1905'
+  raw_name: COLOR
+  unit: UNITS
+  id: color
+- storet: '1915'
+  raw_name: HARDNESS, TOTAL (AS CACO3)
+  unit: MG/L
+  id: hardness
+- storet: '1919'
+  raw_name: CALCIUM
+  unit: MG/L
+  id: calcium
+- storet: '1920'
+  raw_name: ODOR
+  unit: TON
+  id: odor
+- storet: '1925'
+  raw_name: PH
+  unit: PH
+  id: ph
+- storet: '1927'
+  raw_name: ALKALINITY, TOTAL
+  unit: MG/L
+  id: alkalinity
+- storet: '1928'
+  raw_name: ALKALINITY, BICARBONATE
+  unit: MG/L
+  id: bicarbonate
+  notes: Bicarbonate alkalinity as CaCO3.
+- storet: '1929'
+  raw_name: ALKALINITY, CARBONATE
+  unit: MG/L
+  id: null
+- storet: '1930'
+  raw_name: TDS
+  unit: MG/L
+  id: tds
+- storet: '1994'
+  raw_name: AGGRESSIVE INDEX
+  unit: AGGR
+  id: null
+- storet: '1996'
+  raw_name: TEMPERATURE (CENTIGRADE)
+  unit: C
+  id: temperature
+- storet: '1997'
+  raw_name: LANGELIER INDEX (PH(S))
+  unit: LANG
+  id: null
+- storet: '2005'
+  raw_name: ENDRIN
+  unit: UG/L
+  id: null
+- storet: '2010'
+  raw_name: BHC-GAMMA
+  unit: UG/L
+  id: null
+- storet: '2015'
+  raw_name: METHOXYCHLOR
+  unit: UG/L
+  id: null
+- storet: '2020'
+  raw_name: TOXAPHENE
+  unit: UG/L
+  id: null
+- storet: '2021'
+  raw_name: CARBARYL
+  unit: UG/L
+  id: null
+- storet: '2022'
+  raw_name: METHOMYL
+  unit: UG/L
+  id: null
+- storet: '2023'
+  raw_name: BAYGON
+  unit: UG/L
+  id: null
+- storet: '2024'
+  raw_name: METHIOCARB
+  unit: UG/L
+  id: null
+- storet: '2027'
+  raw_name: ACETOCHLOR
+  unit: UG/L
+  id: null
+- storet: '2028'
+  raw_name: PARAQUAT
+  unit: UG/L
+  id: null
+- storet: '2030'
+  raw_name: P-ISOPROPYLTOLUENE
+  unit: UG/L
+  id: null
+- storet: '2031'
+  raw_name: DALAPON
+  unit: UG/L
+  id: null
+- storet: '2032'
+  raw_name: DIQUAT
+  unit: UG/L
+  id: null
+- storet: '2033'
+  raw_name: ENDOTHALL
+  unit: UG/L
+  id: null
+- storet: '2034'
+  raw_name: GLYPHOSATE
+  unit: UG/L
+  id: null
+- storet: '2035'
+  raw_name: DI(2-ETHYLHEXYL) ADIPATE
+  unit: UG/L
+  id: null
+- storet: '2036'
+  raw_name: OXAMYL
+  unit: UG/L
+  id: null
+- storet: '2037'
+  raw_name: SIMAZINE
+  unit: UG/L
+  id: null
+- storet: '2039'
+  raw_name: DI(2-ETHYLHEXYL) PHTHALATE
+  unit: UG/L
+  id: null
+- storet: '2040'
+  raw_name: PICLORAM
+  unit: UG/L
+  id: null
+- storet: '2041'
+  raw_name: DINOSEB
+  unit: UG/L
+  id: null
+- storet: '2042'
+  raw_name: HEXACHLOROCYCLOPENTADIENE
+  unit: UG/L
+  id: null
+- storet: '2043'
+  raw_name: ALDICARB SULFOXIDE
+  unit: UG/L
+  id: null
+- storet: '2044'
+  raw_name: ALDICARB SULFONE
+  unit: UG/L
+  id: null
+- storet: '2045'
+  raw_name: METOLACHLOR
+  unit: UG/L
+  id: null
+- storet: '2046'
+  raw_name: CARBOFURAN
+  unit: UG/L
+  id: null
+- storet: '2047'
+  raw_name: ALDICARB
+  unit: UG/L
+  id: null
+- storet: '2049'
+  raw_name: 1,4-DIOXANE
+  unit: UG/L
+  id: dioxane_14
+- storet: '2050'
+  raw_name: ATRAZINE
+  unit: UG/L
+  id: atrazine
+- storet: '2051'
+  raw_name: LASSO
+  unit: UG/L
+  id: null
+- storet: '2052'
+  raw_name: EPTC
+  unit: UG/L
+  id: null
+- storet: '2055'
+  raw_name: TRIFLURALIN
+  unit: UG/L
+  id: null
+- storet: '2056'
+  raw_name: SPECTRACIDE
+  unit: UG/L
+  id: null
+- storet: '2057'
+  raw_name: CHLOROPYRIFOS
+  unit: UG/L
+  id: null
+- storet: '2063'
+  raw_name: 2,3,7,8-TCDD
+  unit: NG/L
+  id: null
+- storet: '2065'
+  raw_name: HEPTACHLOR
+  unit: UG/L
+  id: null
+- storet: '2066'
+  raw_name: 3-HYDROXYCARBOFURAN
+  unit: UG/L
+  id: null
+- storet: '2067'
+  raw_name: HEPTACHLOR EPOXIDE
+  unit: UG/L
+  id: null
+- storet: '2068'
+  raw_name: ENDOSULFAN I
+  unit: UG/L
+  id: null
+- storet: '2069'
+  raw_name: PARA-PARA DDE
+  unit: UG/L
+  id: null
+- storet: '2070'
+  raw_name: DIELDRIN
+  unit: UG/L
+  id: null
+- storet: '2071'
+  raw_name: PARA-PARA DDD
+  unit: UG/L
+  id: null
+- storet: '2072'
+  raw_name: ENDOSULFAN II
+  unit: UG/L
+  id: null
+- storet: '2074'
+  raw_name: ENDOSULFAN SULFATE
+  unit: UG/L
+  id: null
+- storet: '2075'
+  raw_name: PARA-PARA DDT
+  unit: UG/L
+  id: null
+- storet: '2076'
+  raw_name: BUTACHLOR
+  unit: UG/L
+  id: null
+- storet: '2077'
+  raw_name: PROPACHLOR
+  unit: UG/L
+  id: null
+- storet: '2098'
+  raw_name: BROMACIL
+  unit: UG/L
+  id: null
+- storet: '2102'
+  raw_name: DISULFOTON
+  unit: UG/L
+  id: null
+- storet: '2105'
+  raw_name: 2,4-D
+  unit: UG/L
+  id: null
+- storet: '2106'
+  raw_name: 2,4-DB
+  unit: UG/L
+  id: null
+- storet: '2108'
+  raw_name: DCPA MONO/DI-ACID DEGRADATES
+  unit: UG/L
+  id: null
+- storet: '2110'
+  raw_name: 2,4,5-TP
+  unit: UG/L
+  id: null
+- storet: '2111'
+  raw_name: 2,4,5-T
+  unit: UG/L
+  id: null
+- storet: '2125'
+  raw_name: 3,5-DICHLOROBENZOIC ACID
+  unit: UG/L
+  id: null
+- storet: '2206'
+  raw_name: DICHLORPROP
+  unit: UG/L
+  id: null
+- storet: '2210'
+  raw_name: CHLOROMETHANE
+  unit: UG/L
+  id: null
+- storet: '2212'
+  raw_name: DICHLORODIFLUOROMETHANE
+  unit: UG/L
+  id: null
+- storet: '2213'
+  raw_name: CHLOROTHALONIL
+  unit: UG/L
+  id: null
+- storet: '2214'
+  raw_name: BROMOMETHANE
+  unit: UG/L
+  id: null
+- storet: '2216'
+  raw_name: CHLOROETHANE
+  unit: UG/L
+  id: null
+- storet: '2218'
+  raw_name: TRICHLOROFLUOROMETHANE
+  unit: UG/L
+  id: null
+- storet: '2221'
+  raw_name: DIMETHOATE
+  unit: UG/L
+  id: null
+- storet: '2223'
+  raw_name: DI-N-OCTYL PHTHALATE
+  unit: UG/L
+  id: null
+- storet: '2224'
+  raw_name: TRANS-1,3-DICHLOROPROPENE
+  unit: UG/L
+  id: null
+- storet: '2228'
+  raw_name: CIS-1,3-DICHLOROPROPENE
+  unit: UG/L
+  id: null
+- storet: '2243'
+  raw_name: ACETONE
+  unit: UG/L
+  id: null
+- storet: '2245'
+  raw_name: ISOPROPYL ETHER
+  unit: UG/L
+  id: null
+- storet: '2246'
+  raw_name: HEXACHLOROBUTADIENE
+  unit: UG/L
+  id: null
+- storet: '2247'
+  raw_name: METHYL ETHYL KETONE
+  unit: UG/L
+  id: null
+- storet: '2248'
+  raw_name: NAPHTHALENE
+  unit: UG/L
+  id: null
+- storet: '2251'
+  raw_name: METHYL TERT-BUTYL ETHER
+  unit: UG/L
+  id: mtbe
+- storet: '2260'
+  raw_name: ACENAPHTHYLENE
+  unit: UG/L
+  id: null
+- storet: '2262'
+  raw_name: ISOPHORONE
+  unit: UG/L
+  id: null
+- storet: '2264'
+  raw_name: FLUORENE
+  unit: UG/L
+  id: null
+- storet: '2269'
+  raw_name: 2-HEXANONE
+  unit: UG/L
+  id: null
+- storet: '2270'
+  raw_name: 2,4-DINITROTOLUENE
+  unit: UG/L
+  id: null
+- storet: '2272'
+  raw_name: TERBACIL
+  unit: UG/L
+  id: null
+- storet: '2273'
+  raw_name: TRANS-NONACHLOR
+  unit: UG/L
+  id: null
+- storet: '2274'
+  raw_name: HEXACHLOROBENZENE
+  unit: UG/L
+  id: null
+- storet: '2277'
+  raw_name: 4-METHYL-2-PENTANONE
+  unit: UG/L
+  id: null
+- storet: '2278'
+  raw_name: PHENANTHRENE
+  unit: UG/L
+  id: null
+- storet: '2280'
+  raw_name: ANTHRACENE
+  unit: UG/L
+  id: null
+- storet: '2282'
+  raw_name: DIMETHYL PHTHALATE
+  unit: UG/L
+  id: null
+- storet: '2284'
+  raw_name: DIETHYL PHTHALATE
+  unit: UG/L
+  id: null
+- storet: '2286'
+  raw_name: FLUORANTHENE
+  unit: UG/L
+  id: null
+- storet: '2288'
+  raw_name: PYRENE
+  unit: UG/L
+  id: null
+- storet: '2290'
+  raw_name: DI-N-BUTYL PHTHALATE
+  unit: UG/L
+  id: null
+- storet: '2294'
+  raw_name: BUTYLBENZYL PHTHALATE
+  unit: UG/L
+  id: null
+- storet: '2296'
+  raw_name: CHRYSENE
+  unit: UG/L
+  id: null
+- storet: '2300'
+  raw_name: BENZO(A)ANTHRACENE
+  unit: UG/L
+  id: null
+- storet: '2302'
+  raw_name: BENZO(B)FLUORANTHENE
+  unit: UG/L
+  id: null
+- storet: '2304'
+  raw_name: BENZO(K)FLUORANTHENE
+  unit: UG/L
+  id: null
+- storet: '2306'
+  raw_name: BENZO(A)PYRENE
+  unit: UG/L
+  id: null
+- storet: '2308'
+  raw_name: IDENO(1,2,3-CD)PYRENE
+  unit: UG/L
+  id: null
+- storet: '2310'
+  raw_name: DIBENZO(A,H)ANTHRACENE
+  unit: UG/L
+  id: null
+- storet: '2312'
+  raw_name: BENZO(G,H,I)PERYLENE
+  unit: UG/L
+  id: null
+- storet: '2326'
+  raw_name: PENTACHLOROPHENOL
+  unit: UG/L
+  id: null
+- storet: '2348'
+  raw_name: .ALPHA.-BHC
+  unit: UG/L
+  id: null
+- storet: '2350'
+  raw_name: .BETA.-BHC
+  unit: UG/L
+  id: null
+- storet: '2354'
+  raw_name: .DELTA.-BHC
+  unit: UG/L
+  id: null
+- storet: '2356'
+  raw_name: ALDRIN
+  unit: UG/L
+  id: null
+- storet: '2372'
+  raw_name: ENDRIN ALDEHYDE
+  unit: UG/L
+  id: null
+- storet: '2378'
+  raw_name: 1,2,4-TRICHLOROBENZENE
+  unit: UG/L
+  id: null
+- storet: '2380'
+  raw_name: CIS-1,2-DICHLOROETHYLENE
+  unit: UG/L
+  id: dce_cis_12
+- storet: '2383'
+  raw_name: TOTAL POLYCHLORINATED BIPHENYLS (PCB)
+  unit: UG/L
+  id: null
+- storet: '2388'
+  raw_name: AROCLOR 1016
+  unit: UG/L
+  id: null
+- storet: '2390'
+  raw_name: AROCLOR 1221
+  unit: UG/L
+  id: null
+- storet: '2392'
+  raw_name: AROCLOR 1232
+  unit: UG/L
+  id: null
+- storet: '2394'
+  raw_name: AROCLOR 1242
+  unit: UG/L
+  id: null
+- storet: '2396'
+  raw_name: AROCLOR 1248
+  unit: UG/L
+  id: null
+- storet: '2398'
+  raw_name: AROCLOR 1254
+  unit: UG/L
+  id: null
+- storet: '2400'
+  raw_name: AROCLOR 1260
+  unit: UG/L
+  id: null
+- storet: '2408'
+  raw_name: DIBROMOMETHANE
+  unit: UG/L
+  id: null
+- storet: '2410'
+  raw_name: 1,1-DICHLOROPROPENE
+  unit: UG/L
+  id: null
+- storet: '2412'
+  raw_name: 1,3-DICHLOROPROPANE
+  unit: UG/L
+  id: null
+- storet: '2413'
+  raw_name: 1,3-DICHLOROPROPENE
+  unit: UG/L
+  id: null
+- storet: '2414'
+  raw_name: 1,2,3-TRICHLOROPROPANE
+  unit: UG/L
+  id: tcp_123
+  notes: UG/L in the data; catalogue unit is ppt (DLR 0.005 UG/L = 5 ppt).
+- storet: '2416'
+  raw_name: 2,2-DICHLOROPROPANE
+  unit: UG/L
+  id: null
+- storet: '2418'
+  raw_name: 1,2,4-TRIMETHYLBENZENE
+  unit: UG/L
+  id: null
+- storet: '2420'
+  raw_name: 1,2,3-TRICHLOROBENZENE
+  unit: UG/L
+  id: null
+- storet: '2422'
+  raw_name: N-BUTYLBENZENE
+  unit: UG/L
+  id: null
+- storet: '2424'
+  raw_name: 1,3,5-TRIMETHYLBENZENE
+  unit: UG/L
+  id: null
+- storet: '2426'
+  raw_name: TERT-BUTYLBENZENE
+  unit: UG/L
+  id: null
+- storet: '2428'
+  raw_name: SEC-BUTYLBENZENE
+  unit: UG/L
+  id: null
+- storet: '2430'
+  raw_name: BROMOCHLOROMETHANE
+  unit: UG/L
+  id: null
+- storet: '2440'
+  raw_name: DICAMBA
+  unit: UG/L
+  id: null
+- storet: '2450'
+  raw_name: MONOCHLOROACETIC ACID
+  unit: UG/L
+  id: null
+- storet: '2451'
+  raw_name: DICHLOROACETIC ACID
+  unit: UG/L
+  id: null
+- storet: '2452'
+  raw_name: TRICHLOROACETIC ACID
+  unit: UG/L
+  id: null
+- storet: '2453'
+  raw_name: MONOBROMOACETIC ACID
+  unit: UG/L
+  id: null
+- storet: '2454'
+  raw_name: DIBROMOACETIC ACID
+  unit: UG/L
+  id: null
+- storet: '2456'
+  raw_name: TOTAL HALOACETIC ACIDS (HAA5)
+  unit: UG/L
+  id: haa5
+- storet: '2470'
+  raw_name: ACETALDEHYDE
+  unit: UG/L
+  id: null
+- storet: '2474'
+  raw_name: GLYOXAL
+  unit: UG/L
+  id: null
+- storet: '2595'
+  raw_name: METRIBUZIN
+  unit: UG/L
+  id: null
+- storet: '2625'
+  raw_name: BENTAZON
+  unit: UG/L
+  id: null
+- storet: '2626'
+  raw_name: MOLINATE
+  unit: UG/L
+  id: null
+- storet: '2727'
+  raw_name: THIOBENCARB (BOLERO)
+  unit: UG/L
+  id: null
+- storet: '2801'
+  raw_name: PERFLUOROBUTANE SULFONIC ACID (PFBS)
+  unit: NG/L
+  id: pfbs
+- storet: '2802'
+  raw_name: PERFLUOROHEPTANOIC ACID (PFHPA)
+  unit: NG/L
+  id: pfhpa
+- storet: '2803'
+  raw_name: PERFLUOROHEXANE SULFONIC ACID (PFHxS)
+  unit: NG/L
+  id: pfhxs
+- storet: '2804'
+  raw_name: PERFLUORONONANOIC ACID (PFNA)
+  unit: NG/L
+  id: pfna
+- storet: '2805'
+  raw_name: PERFLUOROCTANE SULFONIC ACID (PFOS)
+  unit: NG/L
+  id: pfos
+- storet: '2806'
+  raw_name: PERFLUOROCTANOIC ACID (PFOA)
+  unit: NG/L
+  id: pfoa
+- storet: '2807'
+  raw_name: PERFLUORODECANOIC ACID (PFDA)
+  unit: NG/L
+  id: null
+- storet: '2808'
+  raw_name: PERFLUORODODECANOIC ACID (PFDOA)
+  unit: NG/L
+  id: null
+- storet: '2809'
+  raw_name: PERFLUOROHEXANOIC ACID (PFHXA)
+  unit: NG/L
+  id: pfhxa
+- storet: '2810'
+  raw_name: PERFLUOROTETRADECANOIC ACID (PFTA)
+  unit: NG/L
+  id: null
+- storet: '2811'
+  raw_name: PERFLUOROTRIDECANOIC ACID (PFTRDA)
+  unit: NG/L
+  id: null
+- storet: '2812'
+  raw_name: PERFLUOROUNDECANOIC ACID (PFUNA)
+  unit: NG/L
+  id: null
+- storet: '2813'
+  raw_name: 11CL-PF3OUDS
+  unit: NG/L
+  id: null
+- storet: '2814'
+  raw_name: 9CL-PF3ONS
+  unit: NG/L
+  id: null
+- storet: '2815'
+  raw_name: ADONA
+  unit: NG/L
+  id: null
+- storet: '2816'
+  raw_name: HFPO-DA
+  unit: NG/L
+  id: null
+- storet: '2817'
+  raw_name: NETFOSAA
+  unit: NG/L
+  id: null
+- storet: '2818'
+  raw_name: NMEFOSAA
+  unit: NG/L
+  id: null
+- storet: '2819'
+  raw_name: PERFLUOROBUTANOIC ACID (PFBA)
+  unit: NG/L
+  id: pfbA
+  notes: Catalogue id is spelled pfbA (capital A) in config/analytes.yaml.
+- storet: '2820'
+  raw_name: PERFLUOROOCTANE SULFONIC ACID 6:2 FTS
+  unit: NG/L
+  id: null
+- storet: '2821'
+  raw_name: PERFLUOROHEXANE SULFONIC ACID 4:2 FTS
+  unit: NG/L
+  id: null
+- storet: '2822'
+  raw_name: PERFLUORODECANE SULFONIC ACID 8:2 FTS
+  unit: NG/L
+  id: null
+- storet: '2823'
+  raw_name: PERFLUORO PFMPA
+  unit: NG/L
+  id: null
+- storet: '2824'
+  raw_name: PERFLUOROPENTANOIC ACID (PFPEA)
+  unit: NG/L
+  id: pfpea
+- storet: '2825'
+  raw_name: PERFLUORO PFMBA
+  unit: NG/L
+  id: null
+- storet: '2826'
+  raw_name: PERFLUORO PFEESA
+  unit: NG/L
+  id: null
+- storet: '2827'
+  raw_name: NONAFLUORO NFDHA
+  unit: NG/L
+  id: null
+- storet: '2828'
+  raw_name: PERFLUOROPENTANESULFONIC ACID (PFPES)
+  unit: NG/L
+  id: null
+- storet: '2829'
+  raw_name: PERFLUOROHEPTANESULFONIC ACID (PFHPS)
+  unit: NG/L
+  id: null
+- storet: '2904'
+  raw_name: TRICHLOROTRIFLUOROETHANE
+  unit: UG/L
+  id: null
+- storet: '2905'
+  raw_name: FOAMING AGENTS (SURFACTANTS)
+  unit: MG/L
+  id: mbas
+- storet: '2920'
+  raw_name: CARBON, TOTAL
+  unit: MG/L
+  id: total_organic_carbon
+  notes: SDWIS code 2920 is total organic carbon (TOC) although the file spells it "CARBON, TOTAL".
+- storet: '2931'
+  raw_name: 1,2-DIBROMO-3-CHLOROPROPANE
+  unit: UG/L
+  id: dbcp
+  notes: UG/L in the data; catalogue unit is ppt.
+- storet: '2941'
+  raw_name: CHLOROFORM
+  unit: UG/L
+  id: null
+- storet: '2942'
+  raw_name: BROMOFORM
+  unit: UG/L
+  id: null
+- storet: '2943'
+  raw_name: BROMODICHLOROMETHANE
+  unit: UG/L
+  id: null
+- storet: '2944'
+  raw_name: DIBROMOCHLOROMETHANE
+  unit: UG/L
+  id: null
+- storet: '2946'
+  raw_name: ETHYLENE DIBROMIDE
+  unit: UG/L
+  id: null
+- storet: '2950'
+  raw_name: TTHM
+  unit: UG/L
+  id: tthm
+- storet: '2955'
+  raw_name: XYLENES, TOTAL
+  unit: UG/L
+  id: xylenes
+  notes: Total xylenes. O-XYLENE (2997) and XYLENE, META AND PARA (2963) stay unmapped.
+- storet: '2959'
+  raw_name: CHLORDANE
+  unit: UG/L
+  id: null
+- storet: '2961'
+  raw_name: FORMALDEHYDE
+  unit: MG/L
+  id: null
+- storet: '2963'
+  raw_name: XYLENE, META AND PARA
+  unit: UG/L
+  id: null
+- storet: '2964'
+  raw_name: DICHLOROMETHANE
+  unit: UG/L
+  id: dichloromethane
+- storet: '2965'
+  raw_name: O-CHLOROTOLUENE
+  unit: UG/L
+  id: null
+- storet: '2966'
+  raw_name: P-CHLOROTOLUENE
+  unit: UG/L
+  id: null
+- storet: '2967'
+  raw_name: M-DICHLOROBENZENE
+  unit: UG/L
+  id: null
+- storet: '2968'
+  raw_name: O-DICHLOROBENZENE
+  unit: UG/L
+  id: null
+- storet: '2969'
+  raw_name: P-DICHLOROBENZENE
+  unit: UG/L
+  id: null
+- storet: '2976'
+  raw_name: VINYL CHLORIDE
+  unit: UG/L
+  id: null
+- storet: '2977'
+  raw_name: 1,1-DICHLOROETHYLENE
+  unit: UG/L
+  id: dce_11
+- storet: '2978'
+  raw_name: 1,1-DICHLOROETHANE
+  unit: UG/L
+  id: null
+- storet: '2979'
+  raw_name: TRANS-1,2-DICHLOROETHYLENE
+  unit: UG/L
+  id: null
+- storet: '2980'
+  raw_name: 1,2-DICHLOROETHANE
+  unit: UG/L
+  id: null
+- storet: '2981'
+  raw_name: 1,1,1-TRICHLOROETHANE
+  unit: UG/L
+  id: null
+- storet: '2982'
+  raw_name: CARBON TETRACHLORIDE
+  unit: UG/L
+  id: carbon_tetrachloride
+- storet: '2983'
+  raw_name: 1,2-DICHLOROPROPANE
+  unit: UG/L
+  id: null
+- storet: '2984'
+  raw_name: TRICHLOROETHYLENE
+  unit: UG/L
+  id: tce
+- storet: '2985'
+  raw_name: 1,1,2-TRICHLOROETHANE
+  unit: UG/L
+  id: null
+- storet: '2986'
+  raw_name: 1,1,1,2-TETRACHLOROETHANE
+  unit: UG/L
+  id: null
+- storet: '2987'
+  raw_name: TETRACHLOROETHYLENE
+  unit: UG/L
+  id: pce
+- storet: '2988'
+  raw_name: 1,1,2,2-TETRACHLOROETHANE
+  unit: UG/L
+  id: null
+- storet: '2989'
+  raw_name: CHLOROBENZENE
+  unit: UG/L
+  id: null
+- storet: '2990'
+  raw_name: BENZENE
+  unit: UG/L
+  id: benzene
+- storet: '2991'
+  raw_name: TOLUENE
+  unit: UG/L
+  id: toluene
+- storet: '2992'
+  raw_name: ETHYLBENZENE
+  unit: UG/L
+  id: null
+- storet: '2993'
+  raw_name: BROMOBENZENE
+  unit: UG/L
+  id: null
+- storet: '2994'
+  raw_name: ISOPROPYLBENZENE
+  unit: UG/L
+  id: null
+- storet: '2996'
+  raw_name: STYRENE
+  unit: UG/L
+  id: null
+- storet: '2997'
+  raw_name: O-XYLENE
+  unit: UG/L
+  id: null
+- storet: '2998'
+  raw_name: N-PROPYLBENZENE
+  unit: UG/L
+  id: null
+- storet: '4006'
+  raw_name: COMBINED URANIUM
+  unit: PCI/L
+  id: uranium
+- storet: '4010'
+  raw_name: COMBINED RADIUM (-226 & -228)
+  unit: PCI/L
+  id: radium_combined
+- storet: '4020'
+  raw_name: RADIUM-226
+  unit: PCI/L
+  id: radium_226
+- storet: '4030'
+  raw_name: RADIUM-228
+  unit: PCI/L
+  id: radium_228
+- storet: '4100'
+  raw_name: GROSS BETA PARTICLE ACTIVITY
+  unit: PCI/L
+  id: gross_beta
+- storet: '4102'
+  raw_name: TRITIUM
+  unit: PCI/L
+  id: null
+- storet: '4109'
+  raw_name: GROSS ALPHA PARTICLE ACTIVITY
+  unit: PCI/L
+  id: gross_alpha
+- storet: '4174'
+  raw_name: 38-STRONTIUM-90
+  unit: PCI/L
+  id: null
+- storet: '7240'
+  raw_name: ALPHA-CHLORDANE
+  unit: UG/L
+  id: null
+- storet: '7245'
+  raw_name: GAMMA-CHLORDANE
+  unit: UG/L
+  id: null
+- storet: '7260'
+  raw_name: CHLOROBENZILATE
+  unit: UG/L
+  id: null
+- storet: '7275'
+  raw_name: CHLOROPROPHAM
+  unit: UG/L
+  id: null
+- storet: '8040'
+  raw_name: PROMETRYN
+  unit: UG/L
+  id: null
+- storet: '8404'
+  raw_name: TERTIARY BUTYL ALCOHOL (TBA)
+  unit: UG/L
+  id: tba
+- storet: '8610'
+  raw_name: DICHLOROVOS
+  unit: UG/L
+  id: null
+- storet: C033
+  raw_name: ETHYL-TERT-BUTYL ETHER
+  unit: UG/L
+  id: null
+- storet: C034
+  raw_name: TERT-AMYL-METHYL ETHER
+  unit: UG/L
+  id: null
+- storet: C080
+  raw_name: TOTAL RADIUM FOR NTNC PER §64442(B)(3)
+  unit: PCI/L
+  id: radium_combined
+  notes: Total radium (226+228) that NTNC systems may report under 22 CCR section 64442(b)(3); 4 rows. Folded into
+    radium_combined.
+- storet: C164
+  raw_name: LANGELIER INDEX AT SOURCE TEMP.
+  unit: LANG
+  id: null
+- storet: C179
+  raw_name: DIPHENAMIDE
+  unit: UG/L
+  id: null
+- storet: C193
+  raw_name: ACIFLURFEN
+  unit: UG/L
+  id: null
+- storet: C253
+  raw_name: PH, FIELD
+  unit: PH
+  id: ph
+  notes: Field pH; folded into ph with laboratory pH (1925).
+- storet: C281
+  raw_name: TOTAL NITROGEN (AS N)
+  unit: MG/L
+  id: null

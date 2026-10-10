@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>South Bay Water Quality</title>
+<meta name="description" content="Drinking-water quality across the water systems of Santa Clara County, colored by each analyte's level relative to its California standard.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 3c5 7 9 12 9 17a9 9 0 0 1-18 0c0-5 4-10 9-17z' fill='%2338bdf8'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="/static/vendor/maplibre-gl.css">
+<link rel="stylesheet" href="/static/styles.css">
+</head>
+<body data-theme="dark">
+<div id="map" role="application" aria-label="Map of water systems"></div>
+
+<header id="topbar">
+  <div class="brand">
+    <span class="drop" aria-hidden="true"></span>
+    <div>
+      <h1>South Bay Water Quality</h1>
+      <p id="subtitle">Santa Clara County · loading…</p>
+    </div>
+  </div>
+  <div id="mode-chip" class="chip" title="What the colors show right now">—</div>
+</header>
+
+<aside id="panel" aria-label="Analyte controls">
+  <div class="panel-head">
+    <div class="seg" role="tablist" aria-label="Data source">
+      <button class="seg-btn active" data-source="ccr" role="tab" aria-selected="true" title="Values printed in each system's annual Consumer Confidence Report">Consumer reports</button>
+      <button class="seg-btn" data-source="lab" role="tab" aria-selected="false" title="Laboratory results submitted to the State Water Board (2023 to present)">State lab results</button>
+    </div>
+    <div id="stats" class="stats" aria-live="polite">
+      <div class="stat"><span class="dot val"></span><b id="stat-value">0</b><span>with data</span></div>
+      <div class="stat"><span class="dot gray"></span><b id="stat-gray">0</b><span>not in report</span></div>
+      <div class="stat"><span class="dot red"></span><b id="stat-red">0</b><span>no report</span></div>
+    </div>
+    <div class="toolbar">
+      <input id="search" type="search" placeholder="Filter analytes… (arsenic, pH, PFAS)" autocomplete="off" aria-label="Filter analytes">
+      <div class="btns">
+        <button id="btn-primary" class="btn" title="Enable only health-based primary standards">Primary</button>
+        <button id="btn-all" class="btn" title="Enable every analyte that has data">All</button>
+        <button id="btn-none" class="btn" title="Turn every analyte off">Clear</button>
+      </div>
+    </div>
+    <div id="solo-banner" class="solo-banner hidden">
+      <span>Soloing <b id="solo-name"></b></span>
+      <button id="solo-exit" class="link">back to composite</button>
+    </div>
+  </div>
+  <div id="analytes" class="analytes" role="list"></div>
+  <div class="panel-foot">
+    <label class="switch-row small">
+      <input type="checkbox" id="toggle-noncommunity" checked>
+      <span class="switch"></span>
+      <span>Show non-community systems (parks, schools, hospitals)</span>
+    </label>
+    <label class="switch-row small">
+      <input type="checkbox" id="toggle-labels" checked>
+      <span class="switch"></span>
+      <span>System labels</span>
+    </label>
+    <div class="foot-links">
+      <button id="btn-theme" class="link">Light basemap</button>
+      <span class="sep">·</span>
+      <a id="about-link" href="#" class="link">About the data</a>
+    </div>
+  </div>
+</aside>
+
+<section id="legend" aria-label="Legend">
+  <div class="legend-title" id="legend-title">Level relative to standard</div>
+  <div class="ramp" id="ramp"></div>
+  <div class="ramp-labels"><span>0</span><span>50%</span><span>100% = standard</span><span>200%+</span></div>
+  <div class="swatches">
+    <div><span class="sw gray"></span>Report exists, analyte not in it</div>
+    <div><span class="sw red"></span>No report found</div>
+    <div><span class="sw hatch"></span>Non-community system, no report required</div>
+    <div><span class="sw nd"></span>Not detected</div>
+  </div>
+  <div class="legend-note" id="legend-note"></div>
+</section>
+
+<section id="detail" class="hidden" aria-label="System detail">
+  <button id="detail-close" class="icon-btn" aria-label="Close">×</button>
+  <div id="detail-body"></div>
+</section>
+
+<div id="about" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modal-card">
+    <button class="icon-btn modal-close" aria-label="Close">×</button>
+    <h2>About the data</h2>
+    <p><b>Boundaries</b> are the State Water Resources Control Board's <i>California Drinking Water System Area Boundaries</i> layer, filtered to Santa Clara County (120 public water systems).</p>
+    <p><b>Consumer reports</b> are each system's own annual Consumer Confidence Report. Values are copied as printed (the report's average when it gives one, otherwise the highest result); when a report has separate columns per water source, the highest column is mapped and every column is shown in the detail panel. Community water systems must publish a CCR every year; non-community systems (parks, schools, workplaces) are not required to, and are hatched.</p>
+    <p><b>State lab results</b> are laboratory analyses submitted to the Division of Drinking Water (EDT library, 2023 to present), aggregated per system and analyte. They include raw source samples, so they can read higher than the treated water a tap receives.</p>
+    <p><b>Color</b> is the level divided by the California standard (MCL, action level, residual limit or secondary standard). pH is colored by distance outside 6.5 to 8.5. Analytes without a standard are scaled against the highest system on the map and say so in the legend.</p>
+    <p>Nothing on this map is estimated. Gray means the report exists and omits that analyte; red means no report could be found.</p>
+    <p class="mono" id="about-meta"></p>
+  </div>
+</div>
+
+<div id="tooltip" class="tooltip hidden" role="tooltip"></div>
+<div id="loading" class="loading"><div class="spinner"></div><div>Loading water systems…</div></div>
+
+<script src="/static/vendor/maplibre-gl.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>
