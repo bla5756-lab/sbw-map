@@ -13,7 +13,7 @@ const S = {
   site: null, geo: null, enabled: new Set(), solo: null, source: 'ccr', showNonCommunity: true, showLabels: true,
   search: '', theme: 'dark', hoverId: null, selected: null, map: null, ready: false, byFid: new Map(),
 };
-window.__sbw = S; // test hook
+window.__sbw = S; // test hook (S.api is attached in boot)
 
 const $ = (sel) => document.querySelector(sel);
 const el = (tag, cls, html) => { const n = document.createElement(tag); if (cls) n.className = cls; if (html != null) n.innerHTML = html; return n; };
@@ -90,7 +90,7 @@ function visible(sys) { return S.showNonCommunity || sys.classification === 'COM
 
 function recolor() {
   if (!S.ready) return;
-  const counts = { value: 0, gray: 0, red: 0 };
+  const counts = { value: 0, gray: 0, red: 0, notRequired: 0 };
   for (const f of S.geo.features) {
     const sys = S.site.systems[f.properties.pwsid];
     const sc = scoreSystem(sys);
@@ -100,13 +100,16 @@ function recolor() {
     if (f.properties.visible) {
       if (sc.kind === 'value' || sc.kind === 'nd' || sc.kind === 'unconverted') counts.value++;
       else if (sc.kind === 'not_in_report') counts.gray++;
-      else if (sc.kind === 'no_report' || sc.kind === 'not_required') counts.red++;
+      else if (sc.kind === 'no_report') counts.red++;
+      else if (sc.kind === 'not_required') counts.notRequired++;
     }
   }
   S.map.getSource('systems').setData(S.geo);
+  syncLabels();
   $('#stat-value').textContent = counts.value;
   $('#stat-gray').textContent = counts.gray;
   $('#stat-red').textContent = counts.red;
+  $('#stat-nr').textContent = counts.notRequired ? `+${counts.notRequired} not required` : '';
   S.counts = counts;
   renderMode();
   renderLegend();
@@ -126,6 +129,7 @@ function addLayers() {
   const map = S.map;
   if (!map.hasImage('hatch')) map.addImage('hatch', hatchImage(), { pixelRatio: 2 });
   if (!map.getSource('systems')) map.addSource('systems', { type: 'geojson', data: S.geo, promoteId: 'fid' });
+  if (!map.getSource('labels')) map.addSource('labels', { type: 'geojson', data: S.labels, promoteId: 'fid' });
   const hover = ['boolean', ['feature-state', 'hover'], false];
   const selected = ['boolean', ['feature-state', 'selected'], false];
   const vis = ['==', ['get', 'visible'], true];
@@ -151,9 +155,9 @@ function addLayers() {
     'line-width': ['case', selected, 2.5, hover, 2, 0.7],
     'line-opacity': ['case', selected, 1, hover, 0.95, S.theme === 'dark' ? 0.35 : 0.45] } });
   const labelPaint = { 'text-color': S.theme === 'dark' ? '#f1f5f9' : '#0f172a', 'text-halo-color': S.theme === 'dark' ? '#0b1020' : '#ffffff', 'text-halo-width': 1.4 };
-  map.addLayer({ id: 'sys-label-big', type: 'symbol', source: 'systems', minzoom: 9, filter: ['all', vis, ['>=', ['get', 'population'], 5000]],
-    layout: { 'text-field': ['get', 'label'], 'text-font': ['Noto Sans Regular'], 'text-size': ['interpolate', ['linear'], ['zoom'], 9, 10, 12, 13], 'text-max-width': 9, 'symbol-placement': 'point', 'text-allow-overlap': false, visibility: S.showLabels ? 'visible' : 'none' }, paint: labelPaint });
-  map.addLayer({ id: 'sys-label-small', type: 'symbol', source: 'systems', minzoom: 12.2, filter: ['all', vis, ['<', ['get', 'population'], 5000]],
+  map.addLayer({ id: 'sys-label-big', type: 'symbol', source: 'labels', minzoom: 9, filter: ['all', vis, ['>=', ['get', 'population'], 5000]],
+    layout: { 'text-field': ['get', 'label'], 'text-font': ['Noto Sans Regular'], 'text-size': ['interpolate', ['linear'], ['zoom'], 9, 10, 12, 13], 'text-max-width': 9, 'text-allow-overlap': false, 'text-variable-anchor': ['center', 'top', 'bottom'], 'text-radial-offset': 0.3, visibility: S.showLabels ? 'visible' : 'none' }, paint: labelPaint });
+  map.addLayer({ id: 'sys-label-small', type: 'symbol', source: 'labels', minzoom: 12.2, filter: ['all', vis, ['<', ['get', 'population'], 5000]],
     layout: { 'text-field': ['get', 'label'], 'text-font': ['Noto Sans Regular'], 'text-size': 11, 'text-max-width': 8, visibility: S.showLabels ? 'visible' : 'none' }, paint: { ...labelPaint, 'text-color': S.theme === 'dark' ? '#cbd5e1' : '#334155' } });
 }
 function ringArea(ring) { let a = 0; for (let i = 0; i < ring.length - 1; i++) a += ring[i][0] * ring[i + 1][1] - ring[i + 1][0] * ring[i][1]; return Math.abs(a / 2); }
@@ -162,7 +166,28 @@ function geomArea(g) {
   if (g.type === 'MultiPolygon') return g.coordinates.reduce((s, p) => s + ringArea(p[0]), 0);
   return 0;
 }
+function ringCentroid(ring) {
+  let a = 0, cx = 0, cy = 0;
+  for (let i = 0; i < ring.length - 1; i++) {
+    const f = ring[i][0] * ring[i + 1][1] - ring[i + 1][0] * ring[i][1];
+    a += f; cx += (ring[i][0] + ring[i + 1][0]) * f; cy += (ring[i][1] + ring[i + 1][1]) * f;
+  }
+  if (!a) return ring[0];
+  return [cx / (3 * a), cy / (3 * a)];
+}
+function labelPoint(g) {
+  const polys = g.type === 'Polygon' ? [g.coordinates] : g.coordinates;
+  let best = polys[0], bestA = -1;
+  for (const p of polys) { const ar = ringArea(p[0]); if (ar > bestA) { bestA = ar; best = p; } }
+  return ringCentroid(best[0]);
+}
+function syncLabels() {
+  if (!S.labels) return;
+  for (const f of S.labels.features) { const src = S.byFid.get(f.properties.fid); f.properties.visible = src.properties.visible; }
+  S.map.getSource('labels')?.setData(S.labels);
+}
 function prepareGeo() {
+  S.labels = { type: 'FeatureCollection', features: [] };
   for (const f of S.geo.features) {
     const sys = S.site.systems[f.properties.pwsid];
     f.properties.area = geomArea(f.geometry);
@@ -170,6 +195,7 @@ function prepareGeo() {
     f.properties.population = sys.population || 0;
     f.properties.label = titleCase(sys.name);
     S.byFid.set(f.properties.fid, f);
+    S.labels.features.push({ type: 'Feature', id: f.properties.fid, properties: { fid: f.properties.fid, label: f.properties.label, population: f.properties.population, visible: true }, geometry: { type: 'Point', coordinates: labelPoint(f.geometry) } });
   }
 }
 function topFeatureAt(point) {
@@ -432,6 +458,7 @@ async function boot() {
   const c = site.counts;
   $('#subtitle').textContent = `${site.region} · ${c.systems} systems · ${c.reports_found} reports found · generated ${site.generated.slice(0, 10)}`;
   $('#about-meta').textContent = `Built ${site.generated}. Boundaries: ${c.systems} systems (${c.community} community). Reports found: ${c.reports_found}; not found: ${c.reports_not_found}; not required: ${c.reports_not_required}. Lab layer: ${c.lab_systems} systems.`;
+  S.api = { openDetail, closeDetail, scoreSystem, recolor, setSource, renderSidebar };
   setSource(S.source);
   initMap();
   // controls

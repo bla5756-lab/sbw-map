@@ -44,10 +44,22 @@ def load_systems(boundaries_path: Path) -> tuple[dict, dict]:
     return systems, {"type": "FeatureCollection", "features": features}
 
 
+def _effective(e: dict) -> tuple[float | None, str | None]:
+    """The printed number an entry contributes: value, else the range high when a range shows a detection."""
+    if e.get("detected") is False:
+        return None, None
+    if e.get("value") is not None:
+        return e["value"], e.get("value_basis")
+    if e.get("range_high") not in (None, 0):
+        return e["range_high"], "range_high"
+    return None, None
+
+
 def _entry_value(cat_analyte: dict, e: dict) -> float | None:
-    if e.get("detected") is False or e.get("value") is None:
+    v, _ = _effective(e)
+    if v is None:
         return None
-    return convert(e.get("value"), e.get("unit_raw"), cat_analyte["unit"])
+    return convert(v, e.get("unit_raw"), cat_analyte["unit"])
 
 
 def merge_ccr(systems: dict, cat: dict, ccr_dir: Path) -> list[str]:
@@ -85,7 +97,10 @@ def merge_ccr(systems: dict, cat: dict, ccr_dir: Path) -> list[str]:
             for e in entries:
                 v = _entry_value(a, e)
                 e["value_converted"] = v
-                if e.get("detected") is not False and e.get("value") is not None:
+                raw, basis = _effective(e)
+                if basis == "range_high":
+                    e["value_basis_effective"] = "range_high"
+                if raw is not None:
                     any_detected = True
                     if v is None:
                         unconverted += 1
@@ -102,7 +117,7 @@ def merge_ccr(systems: dict, cat: dict, ccr_dir: Path) -> list[str]:
                 "status": status_v,
                 "value": best_val,
                 "unit": a["unit"],
-                "basis": best.get("value_basis") if best else None,
+                "basis": (best.get("value_basis_effective") or best.get("value_basis")) if best else None,
                 "source_group": best.get("source_group") if best else None,
                 "entries": entries,
             }
@@ -126,8 +141,8 @@ def attach_sdwis(systems: dict, cat: dict, sdwis_path: Path) -> dict | None:
                 continue
             a = cat["by_id"][aid]
             unit = agg.get("unit")
-            latest = convert(agg.get("latest_value"), unit, a["unit"])
-            mx = convert(agg.get("max"), unit, a["unit"])
+            latest = convert(agg.get("latest_value"), unit, a["unit"], aid)
+            mx = convert(agg.get("max"), unit, a["unit"], aid)
             prev = lab.get(aid)
             if prev and (mx is None or (prev.get("max") or 0) >= (mx or 0)):
                 continue

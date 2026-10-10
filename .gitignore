@@ -6,3 +6,5 @@ node_modules/
 data/raw/
 tests/web_tests/screenshots/
 *.log
+data/site.json
+data/site.geojson
