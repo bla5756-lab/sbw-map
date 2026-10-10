@@ -165,15 +165,28 @@ def merge_ccr(systems: dict, cat: dict, ccr_dir: Path) -> list[str]:
 
 
 def _lab_agg(a: dict, aid: str, agg: dict, unit: str | None) -> dict:
-    """Convert one SDWIS aggregate (all points, or one sampling-point class) to catalogue units."""
+    """Convert one SDWIS aggregate (all points, or one sampling-point class) to catalogue units.
+
+    The representative figure (`basis_value`) is the mean over every sample with non-detects
+    counted as zero (the way a CCR average treats them), or for lead and copper the 90th
+    percentile of tap samples (ND when fewer than a tenth of the samples detected anything).
+    `max` stays available as the worst single sample.
+    """
+    n, n_det = agg.get("n") or 0, agg.get("n_detected") or 0
     latest = convert(agg.get("latest_value"), unit, a["unit"], aid)
     mx = convert(agg.get("max"), unit, a["unit"], aid)
     p90 = convert(agg.get("p90"), unit, a["unit"], aid)
-    basis_val, basis = (p90, "p90") if (a["group"] == "lead_copper" and p90 is not None) else (mx, "max")
+    mean_det = convert(agg.get("mean_detected"), unit, a["unit"], aid)
+    mean_all = (mean_det * n_det / n) if (mean_det is not None and n) else (0.0 if n and not n_det else None)
+    if a["group"] == "lead_copper":
+        basis_val, basis = ((p90 if n_det / n > 0.1 else 0.0) if n and p90 is not None else (0.0 if n and not n_det else p90)), "p90"
+    else:
+        basis_val, basis = mean_all, "mean"
     return {
-        "status": "value" if (latest is not None or mx is not None) else "nd",
-        "latest": latest, "max": mx, "p90": p90, "p90_n": agg.get("p90_n"), "basis_value": basis_val, "basis": basis,
-        "unit": a["unit"], "n": agg.get("n"), "n_detected": agg.get("n_detected"), "latest_date": agg.get("latest_date"),
+        "status": "value" if n_det else "nd",
+        "latest": latest, "max": mx, "p90": p90, "p90_n": agg.get("p90_n"), "mean": mean_all,
+        "basis_value": basis_val, "basis": basis,
+        "unit": a["unit"], "n": n, "n_detected": n_det, "latest_date": agg.get("latest_date"),
         "sampling_points": agg.get("sampling_points"), "raw_name": agg.get("raw_name"),
     }
 
@@ -233,6 +246,7 @@ def compute_ratios(systems: dict, cat: dict) -> None:
                 lv["ratio"] = ratio_to_standard(a, basis, rel_max_lab) if basis is not None else 0.0
                 mv = lv.get("map_value")
                 lv["map_ratio"] = ratio_to_standard(a, mv, rel_max_lab) if mv is not None else 0.0
+                lv["max_ratio"] = ratio_to_standard(a, lv["max"], rel_max_lab) if lv["max"] is not None else 0.0
                 for cls in (lv.get("classes") or {}).values():
                     cls["ratio"] = ratio_to_standard(a, cls["basis_value"], rel_max_lab) if cls["basis_value"] is not None else 0.0
 

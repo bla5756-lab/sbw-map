@@ -59,7 +59,7 @@
     <label class="switch-row small hidden" id="lab-options" title="Off: distribution-system samples when a system has them, otherwise its source wells. On: the worst value at any sampling point, including untreated wells.">
       <input type="checkbox" id="toggle-labpoints">
       <span class="switch"></span>
-      <span>Lab: include raw source-well samples (worst of all points)</span>
+      <span>Lab: worst single sample at any point (incl. raw wells)</span>
     </label>
     <label class="switch-row small">
       <input type="checkbox" id="toggle-labels" checked>
@@ -99,7 +99,7 @@
     <h2>About the data</h2>
     <p><b>Boundaries</b> are the State Water Resources Control Board's <i>California Drinking Water System Area Boundaries</i> layer, filtered to Santa Clara County (120 public water systems).</p>
     <p><b>Consumer reports</b> are each system's own annual Consumer Confidence Report. Values are copied as printed (the report's average when it gives one, otherwise the highest result); when a report has separate columns per water source, the highest column is mapped and every column is shown in the detail panel. Community water systems must publish a CCR every year; non-community systems (parks, schools, workplaces) are not required to, and are hatched.</p>
-    <p><b>State lab results</b> are laboratory analyses submitted to the Division of Drinking Water (EDT library, 2023 to present), aggregated per system and analyte. They include raw source samples, so they can read higher than the treated water a tap receives.</p>
+    <p><b>State lab results</b> are laboratory analyses submitted to the Division of Drinking Water (EDT library, 2023 to present), aggregated per system and analyte. The map uses the average of distribution-system samples (non-detects counted as zero) when a system has them, otherwise its source wells; lead and copper use the 90th percentile of tap samples. The worst single sample at any point, including untreated wells, is available with the toggle in the sidebar.</p>
     <p><b>Color</b> is the level divided by the California standard (MCL, action level, residual limit or secondary standard). pH is colored by distance outside 6.5 to 8.5. Analytes without a standard are scaled against the highest system on the map and say so in the legend.</p>
     <p>Nothing on this map is estimated. Gray means the report exists and omits that analyte; red means no report could be found.</p>
     <p class="mono" id="about-meta"></p>

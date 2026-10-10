@@ -104,8 +104,9 @@ function scoreSystem(sys) {
   if (!ids.length) return { kind: 'none', items: [] };
   const items = ids.map((id) => {
     const v = lab[id]; if (!v) return null;
-    if (S.labAllPoints || !v.classes || !Object.keys(v.classes).length) return { id, ...v, value: v.basis_value ?? v.max ?? v.latest, cls: 'all', detected: !!v.n_detected };
-    return { id, ...v, value: v.map_value, ratio: v.map_ratio, cls: v.map_class, detected: v.map_detected };
+    if (S.labAllPoints) return { id, ...v, value: v.max, ratio: v.max_ratio, cls: 'all', detected: !!v.n_detected, labBasis: 'max' };
+    if (!v.classes || !Object.keys(v.classes).length) return { id, ...v, value: v.basis_value, cls: 'all', detected: !!v.n_detected, labBasis: v.basis };
+    return { id, ...v, value: v.map_value, ratio: v.map_ratio, cls: v.map_class, detected: v.map_detected, labBasis: v.basis };
   }).filter(Boolean);
   if (!items.length) return { kind: 'not_in_report', items: [] };
   return finish(items, items.every((it) => !it.detected));
@@ -396,7 +397,7 @@ function renderTooltip(sys) {
     const detected = S.source === 'ccr' ? it.status !== 'nd' : (it.detected ?? !!it.n_detected);
     const val = detected ? `${fmt(it.value)} ${a.unit}` : 'ND';
     const col = detected ? rampColor(it.ratio) : KIND_COLOR.nd;
-    const hint = S.source === 'ccr' ? (detected && it.basis_tier === 2 ? ' (worst single result)' : '') : (it.cls === 'source' ? ' (source wells)' : it.cls === 'distribution' ? ' (distribution)' : ' (all points)');
+    const hint = S.source === 'ccr' ? (detected && it.basis_tier === 2 ? ' (worst single result)' : '') : ` (${it.labBasis === 'max' ? 'worst sample' : it.labBasis === 'p90' ? '90th pct' : 'avg'}, ${it.cls === 'source' ? 'source wells' : it.cls === 'distribution' ? 'distribution' : 'all points'})`;
     html += `<div class="tt-row"><span>${esc(a.name)}<span class="sub" style="display:inline;margin:0">${hint}</span></span><span class="num" style="color:${col}">${val}${detected && it.ratio != null && a.threshold_type !== 'NONE' ? ` · ${pct(it.ratio)}` : ''}</span></div>`;
   }
   if (sc.items.length > 7) html += `<div class="sub">+${sc.items.length - 7} more</div>`;
@@ -473,17 +474,18 @@ function renderCcrTable(sys) {
 }
 function renderLabTable(sys) {
   if (!sys.lab || !Object.keys(sys.lab).length) return '<p class="sub">No laboratory results for this system in the state database (2023 to present).</p>';
-  let html = `<p class="sub">${sys.lab_meta?.n_rows?.toLocaleString() ?? ''} results on file · latest sample ${esc(sys.lab_meta?.latest_sample || '—')}. Max and latest values across all sampling points, including raw sources.</p>`;
+  let html = `<p class="sub">${sys.lab_meta?.n_rows?.toLocaleString() ?? ''} results on file · latest sample ${esc(sys.lab_meta?.latest_sample || '—')}. Average = mean of every sample with non-detects as zero (lead and copper: 90th percentile of tap samples); the per-class line splits distribution-system from source-well samples.</p>`;
   const groups = groupRows(sys.lab);
   for (const [g, rows] of Object.entries(groups)) {
-    html += `<div class="card"><h3>${esc(S.site.groups[g] || g)}</h3><table class="vals"><thead><tr><th>Analyte</th><th>Max</th><th>Latest</th><th>Samples</th></tr></thead><tbody>`;
+    html += `<div class="card"><h3>${esc(S.site.groups[g] || g)}</h3><table class="vals"><thead><tr><th>Analyte</th><th>Average</th><th>Worst sample</th><th>Latest</th><th>Detected</th></tr></thead><tbody>`;
     for (const [a, v] of rows) {
       const det = !!v.n_detected;
+      const lc = a.group === 'lead_copper';
+      const rep = lc ? v.p90 : v.mean;
       const bar = det && v.ratio != null && a.threshold_type !== 'NONE' ? `<div class="bar"><i style="width:${Math.min(100, v.ratio * 100)}%;background:${rampColor(v.ratio)}"></i></div>` : '';
-      const lc = a.group === 'lead_copper' && v.p90 != null;
       const cls = v.classes || {};
-      const clsLine = Object.keys(cls).length ? `<div class="sub" style="margin:2px 0 0">${['distribution', 'source'].filter((k) => cls[k]).map((k) => `${k}: ${cls[k].n_detected ? fmt(cls[k].basis_value) + ' ' + a.unit : 'ND'} (${cls[k].n_detected}/${cls[k].n})`).join(' · ')}</div>` : '';
-      html += `<tr><td><b>${esc(a.name)}</b><div class="sub" style="margin:0">${esc(stdLabel(a))}${lc ? ' · colored by 90th percentile of tap samples' : ''}</div>${clsLine}</td><td class="num">${det ? `${lc ? `${fmt(v.p90)} ${a.unit} <span class="sub">p90</span><div class="sub" style="margin:0">max ${fmt(v.max)}</div>` : `${fmt(v.max)} ${a.unit}`}` : 'ND'}${bar}</td><td class="num">${v.latest != null ? `${fmt(v.latest)} ${a.unit}` : 'ND'}<div class="sub" style="margin:0">${esc(v.latest_date || '')}</div></td><td class="num">${v.n_detected ?? 0}/${v.n ?? 0}${v.sampling_points ? `<div class="sub" style="margin:0">${v.sampling_points} pts</div>` : ''}</td></tr>`;
+      const clsLine = Object.keys(cls).length ? `<div class="sub" style="margin:2px 0 0">${['distribution', 'source'].filter((k) => cls[k]).map((k) => `${k}: ${cls[k].n_detected ? fmt(lc ? cls[k].p90 : cls[k].mean) + ' ' + a.unit : 'ND'} (${cls[k].n_detected}/${cls[k].n})`).join(' · ')}</div>` : '';
+      html += `<tr><td><b>${esc(a.name)}</b><div class="sub" style="margin:0">${esc(stdLabel(a))}${lc ? ' · 90th pct of taps' : ''}</div>${clsLine}</td><td class="num">${det ? `${fmt(rep)} ${a.unit}` : 'ND'}${bar}</td><td class="num">${det ? `${fmt(v.max)} ${a.unit}` : 'ND'}</td><td class="num">${v.latest != null ? `${fmt(v.latest)} ${a.unit}` : 'ND'}<div class="sub" style="margin:0">${esc(v.latest_date || '')}</div></td><td class="num">${v.n_detected ?? 0}/${v.n ?? 0}${v.sampling_points ? `<div class="sub" style="margin:0">${v.sampling_points} pts</div>` : ''}</td></tr>`;
     }
     html += '</tbody></table></div>';
   }
@@ -543,7 +545,7 @@ function renderLegend() {
   if (a && a.threshold_type === 'NONE') { t.textContent = `${a.name}: relative to the highest system (no standard)`; note.textContent = 'No California standard exists for this analyte; 100% = the highest value on the map.'; }
   else if (a && a.threshold_type === 'RANGE') { t.textContent = `${a.name}: distance outside ${a.threshold_low}–${a.threshold}`; note.textContent = 'Inside the recommended range reads 0; 100% = one full range-width outside it.'; }
   else if (a) { t.textContent = `${a.name} as % of ${a.threshold_type} (${fmt(a.threshold)} ${a.unit})`; note.textContent = a.notes || ''; }
-  else { t.textContent = 'Worst fraction of standard among enabled analytes'; note.textContent = S.source === 'lab' ? (S.labAllPoints ? 'Lab values are the maximum across all sampling points, including untreated source wells.' : 'Lab values use distribution-system samples when a system has them, otherwise its source wells.') : ''; }
+  else { t.textContent = 'Worst fraction of standard among enabled analytes'; note.textContent = S.source === 'lab' ? (S.labAllPoints ? 'Lab values are the worst single sample across all sampling points, including untreated source wells.' : 'Lab values are the average of distribution-system samples (non-detects as zero) when a system has them, otherwise of its source wells.') : ''; }
 }
 
 /* ---------- state persistence ---------- */
