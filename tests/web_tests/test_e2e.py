@@ -164,11 +164,11 @@ def test_lab_mode_prefers_distribution_samples_and_offers_raw_toggle(page):
     page.wait_for_timeout(500)
     assert not page.locator("#lab-options").evaluate("e => e.classList.contains('hidden')")
     assert "distribution" in page.text_content("#legend-note")
-    before = _counts(page)
+    before = state(page)["counts"]
     page.click("label#lab-options .switch")
     page.wait_for_timeout(500)
     assert "all sampling points" in page.text_content("#legend-note")
-    assert _counts(page)["red"] == before["red"]
+    assert state(page)["counts"]["red"] == before["red"]
     page.click("label#lab-options .switch")
     page.click(".seg-btn[data-source=ccr]")
     page.wait_for_timeout(300)

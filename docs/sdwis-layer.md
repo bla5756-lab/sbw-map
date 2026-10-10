@@ -154,7 +154,13 @@ Decisions worth knowing:
   CA4300779 Lakeside SD - Lakeside School (NTNC), CA4301062 Lee's Orchard Owners Association
   (13 connections).
 - Sampling points: 99,849 rows at wells, 20,639 distribution, 3,288 intakes, 2,472 treatment
-  plants, 901 other, 588 springs, 265 consecutive connections, 22 SS/CH.
+  plants, 901 other, 588 springs, 265 consecutive connections, 22 SS/CH. By class: 23,130 rows are
+  `distribution` (DS + TP + SS) and 104,894 `source`. 91 of the 117 systems with rows have some
+  distribution-class rows (13 of them have nothing else: small systems whose only reported samples
+  are tap or treated-water samples), 104 have source-class rows. Per system, on average 9.0
+  analytes carry a distribution sub-aggregate (11.6 over the 91 systems that have any; median 13)
+  and 76.8 carry a source one (86.4 over the 104; median 88), against 83.5 analytes per system
+  overall.
 - Systems with the most rows: CA4310011 San Jose Water 48,043; CA4310001 CWSC Los Altos Suburban
   15,868; CA4310012 City of Santa Clara 7,216; CA4310004 City of Gilroy 6,331; CA4310020 City of
   San Jose - EVG/EDV/COY 5,380; CA4310022 Great Oaks WC 5,044; CA4310006 City of Morgan Hill 4,913;
