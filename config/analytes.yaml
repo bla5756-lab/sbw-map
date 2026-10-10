@@ -1,0 +1,798 @@
+# Canonical analyte catalogue for southbay-water.
+#
+# One entry per analyte the map can display. Standards are California drinking-water standards
+# (Title 22 CCR) unless noted; where California has no standard the federal value is given and
+# marked. `threshold_type`:
+#   MCL   maximum contaminant level (primary, health based)
+#   AL    action level (lead/copper, 90th percentile of tap samples)
+#   MRDL  maximum residual disinfectant level
+#   SMCL  secondary MCL (aesthetic: taste, odor, color)
+#   TT    treatment technique (turbidity, microbial) - numeric limit given where one exists
+#   NL    notification level (California, advisory, not enforceable)
+#   RANGE recommended range (pH) - threshold_low/threshold_high
+#   NONE  no standard; the map scales relative to the other systems
+# `phg` = California Public Health Goal (OEHHA) or federal MCLG where marked.
+# `unit` is the canonical unit values are stored in; `aliases` are names as printed in CCRs.
+# ppb = ug/L, ppm = mg/L, ppt = ng/L.
+
+groups:
+  inorganic: Inorganic contaminants
+  radiological: Radioactive contaminants
+  disinfection: Disinfectants and disinfection byproducts
+  lead_copper: Lead and copper (at the tap)
+  microbial: Microbial
+  organic: Organic and volatile organic contaminants
+  pfas: PFAS (unregulated / notification levels)
+  secondary: Secondary standards (aesthetic)
+  general: General mineral and physical (no standard)
+
+analytes:
+  # ---------------- inorganic (primary) ----------------
+  - id: arsenic
+    name: Arsenic
+    group: inorganic
+    unit: ppb
+    threshold: 10
+    threshold_type: MCL
+    phg: 0.004
+    aliases: [Arsenic, As]
+  - id: nitrate_n
+    name: Nitrate (as N)
+    group: inorganic
+    unit: ppm
+    threshold: 10
+    threshold_type: MCL
+    phg: 10
+    aliases: ["Nitrate (as N)", "Nitrate as N", "Nitrate (as nitrogen)", "Nitrate as nitrogen", "Nitrate-N", "Nitrate (N)"]
+    notes: "Older reports give nitrate as NO3 with MCL 45 ppm; convert (as N = as NO3 / 4.43) and note it."
+  - id: nitrite_n
+    name: Nitrite (as N)
+    group: inorganic
+    unit: ppm
+    threshold: 1
+    threshold_type: MCL
+    phg: 1
+    aliases: ["Nitrite (as N)", "Nitrite as N", "Nitrite"]
+  - id: fluoride
+    name: Fluoride
+    group: inorganic
+    unit: ppm
+    threshold: 2
+    threshold_type: MCL
+    phg: 1
+    aliases: [Fluoride, "Fluoride (naturally occurring)", "Fluoride (optimal level)", "Fluoride (treatment related)"]
+  - id: chromium_6
+    name: Hexavalent chromium
+    group: inorganic
+    unit: ppb
+    threshold: 10
+    threshold_type: MCL
+    phg: 0.02
+    aliases: ["Hexavalent chromium", "Chromium VI", "Chromium 6", "Chromium-6", "Chromium (VI)", "Cr(VI)", "Cr6", "Chromium, hexavalent"]
+    notes: "California MCL 10 ppb re-adopted effective 2024-10-01."
+  - id: chromium_total
+    name: Chromium (total)
+    group: inorganic
+    unit: ppb
+    threshold: 50
+    threshold_type: MCL
+    phg: null
+    aliases: ["Chromium", "Total chromium", "Chromium (total)", total"]
+  - id: barium
+    name: Barium
+    group: inorganic
+    unit: ppm
+    threshold: 1
+    threshold_type: MCL
+    phg: 2
+    aliases: [Barium]
+  - id: selenium
+    name: Selenium
+    group: inorganic
+    unit: ppb
+    threshold: 50
+    threshold_type: MCL
+    phg: 30
+    aliases: [Selenium]
+  - id: antimony
+    name: Antimony
+    group: inorganic
+    unit: ppb
+    threshold: 6
+    threshold_type: MCL
+    phg: 1
+    aliases: [Antimony]
+  - id: beryllium
+    name: Beryllium
+    group: inorganic
+    unit: ppb
+    threshold: 4
+    threshold_type: MCL
+    phg: 1
+    aliases: [Beryllium]
+  - id: cadmium
+    name: Cadmium
+    group: inorganic
+    unit: ppb
+    threshold: 5
+    threshold_type: MCL
+    phg: 0.04
+    aliases: [Cadmium]
+  - id: mercury
+    name: Mercury
+    group: inorganic
+    unit: ppb
+    threshold: 2
+    threshold_type: MCL
+    phg: 1.2
+    aliases: [Mercury, "Mercury (inorganic)"]
+  - id: nickel
+    name: Nickel
+    group: inorganic
+    unit: ppb
+    threshold: 100
+    threshold_type: MCL
+    phg: 12
+    aliases: [Nickel]
+  - id: thallium
+    name: Thallium
+    group: inorganic
+    unit: ppb
+    threshold: 2
+    threshold_type: MCL
+    phg: 0.1
+    aliases: [Thallium]
+  - id: cyanide
+    name: Cyanide
+    group: inorganic
+    unit: ppb
+    threshold: 150
+    threshold_type: MCL
+    phg: 150
+    aliases: [Cyanide]
+  - id: perchlorate
+    name: Perchlorate
+    group: inorganic
+    unit: ppb
+    threshold: 6
+    threshold_type: MCL
+    phg: 1
+    aliases: [Perchlorate]
+  - id: aluminum
+    name: Aluminum
+    group: inorganic
+    unit: ppb
+    threshold: 1000
+    threshold_type: MCL
+    phg: 600
+    aliases: [Aluminum]
+    notes: "Primary MCL 1 ppm; secondary MCL 0.2 ppm."
+  - id: asbestos
+    name: Asbestos
+    group: inorganic
+    unit: MFL
+    threshold: 7
+    threshold_type: MCL
+    phg: 7
+    aliases: [Asbestos]
+
+  # ---------------- radiological ----------------
+  - id: gross_alpha
+    name: Gross alpha activity
+    group: radiological
+    unit: pCi/L
+    threshold: 15
+    threshold_type: MCL
+    phg: 0
+    aliases: ["Gross alpha", "Gross alpha particle activity", "Alpha, gross"]
+  - id: uranium
+    name: Uranium
+    group: radiological
+    unit: pCi/L
+    threshold: 20
+    threshold_type: MCL
+    phg: 0.43
+    aliases: [Uranium]
+  - id: radium_228
+    name: Radium-228
+    group: radiological
+    unit: pCi/L
+    threshold: 5
+    threshold_type: MCL
+    phg: 0.019
+    aliases: ["Radium 228", "Radium-228", "Ra-228"]
+    notes: "MCL 5 pCi/L applies to combined radium 226 + 228."
+  - id: radium_226
+    name: Radium-226
+    group: radiological
+    unit: pCi/L
+    threshold: 5
+    threshold_type: MCL
+    phg: 0.05
+    aliases: ["Radium 226", "Radium-226", "Ra-226"]
+  - id: radium_combined
+    name: Radium 226 + 228
+    group: radiological
+    unit: pCi/L
+    threshold: 5
+    threshold_type: MCL
+    phg: null
+    aliases: ["Combined radium", "Radium 226 + 228", "Radium 226+228", "Radium 226 and 228"]
+  - id: gross_beta
+    name: Gross beta activity
+    group: radiological
+    unit: pCi/L
+    threshold: 50
+    threshold_type: MCL
+    phg: 0
+    aliases: ["Gross beta", "Gross beta particle activity", "Beta, gross"]
+    notes: "MCL is 4 mrem/yr; the state screening level is 50 pCi/L."
+  - id: radon
+    name: Radon
+    group: radiological
+    unit: pCi/L
+    threshold: null
+    threshold_type: NONE
+    phg: null
+    aliases: [Radon, Radon-222]
+
+  # ---------------- disinfection ----------------
+  - id: tthm
+    name: Total trihalomethanes (TTHM)
+    group: disinfection
+    unit: ppb
+    threshold: 80
+    threshold_type: MCL
+    phg: null
+    aliases: ["TTHM", "Total trihalomethanes", "TTHMs", "Trihalomethanes"]
+  - id: haa5
+    name: Haloacetic acids (HAA5)
+    group: disinfection
+    unit: ppb
+    threshold: 60
+    threshold_type: MCL
+    phg: null
+    aliases: ["HAA5", "Haloacetic acids", "Haloacetic Acids (five)", "Haloacetic acids (HAA5)", "HAAs"]
+  - id: chlorine_residual
+    name: Chlorine residual
+    group: disinfection
+    unit: ppm
+    threshold: 4
+    threshold_type: MRDL
+    phg: 4
+    aliases: ["Chlorine", "Chlorine residual", "Free chlorine", "Total chlorine", "Chlorine (as Cl2)", "Chlorine residual (as Cl2)"]
+  - id: chloramines
+    name: Chloramines
+    group: disinfection
+    unit: ppm
+    threshold: 4
+    threshold_type: MRDL
+    phg: 4
+    aliases: ["Chloramines", "Chloramine", "Chloramines (as Cl2)", "Total chloramine", "Monochloramine"]
+  - id: bromate
+    name: Bromate
+    group: disinfection
+    unit: ppb
+    threshold: 10
+    threshold_type: MCL
+    phg: 0.1
+    aliases: [Bromate]
+  - id: chlorite
+    name: Chlorite
+    group: disinfection
+    unit: ppm
+    threshold: 1
+    threshold_type: MCL
+    phg: 0.05
+    aliases: [Chlorite]
+  - id: chlorate
+    name: Chlorate
+    group: disinfection
+    unit: ppb
+    threshold: 800
+    threshold_type: NL
+    phg: null
+    aliases: [Chlorate]
+
+  # ---------------- lead and copper ----------------
+  - id: lead
+    name: Lead (90th percentile)
+    group: lead_copper
+    unit: ppb
+    threshold: 15
+    threshold_type: AL
+    phg: 0.2
+    aliases: [Lead, "Lead (90th percentile)", "Lead - 90th percentile"]
+  - id: copper
+    name: Copper (90th percentile)
+    group: lead_copper
+    unit: ppm
+    threshold: 1.3
+    threshold_type: AL
+    phg: 0.3
+    aliases: [Copper, "Copper (90th percentile)", "Copper - 90th percentile"]
+
+  # ---------------- microbial ----------------
+  - id: total_coliform
+    name: Total coliform (% positive, highest month)
+    group: microbial
+    unit: "%"
+    threshold: 5
+    threshold_type: TT
+    phg: 0
+    aliases: ["Total coliform", "Total Coliform Bacteria", "Coliform"]
+    notes: "Under the Revised Total Coliform Rule the standard is a treatment technique; 5% positive samples in a month is the assessment trigger (systems with 40+ monthly samples)."
+  - id: e_coli
+    name: E. coli (positive samples)
+    group: microbial
+    unit: count
+    threshold: 0
+    threshold_type: MCL
+    phg: 0
+    aliases: ["E. coli", "E.coli", "Escherichia coli", "Fecal coliform / E. coli", "Fecal coliform and E. coli"]
+  - id: turbidity
+    name: Turbidity
+    group: microbial
+    unit: NTU
+    threshold: 1
+    threshold_type: TT
+    phg: null
+    aliases: [Turbidity, "Turbidity (highest single measurement)", "Turbidity (NTU)"]
+    notes: "Surface water treatment: 1 NTU maximum, 95% of monthly readings at or below 0.3 NTU. Groundwater distribution: secondary MCL 5 NTU."
+  - id: heterotrophic_bacteria
+    name: Heterotrophic plate count
+    group: microbial
+    unit: CFU/mL
+    threshold: 500
+    threshold_type: TT
+    phg: null
+    aliases: ["Heterotrophic plate count", "HPC", "Heterotrophic bacteria"]
+
+  # ---------------- organic ----------------
+  - id: tcp_123
+    name: 1,2,3-Trichloropropane
+    group: organic
+    unit: ppt
+    threshold: 5
+    threshold_type: MCL
+    phg: 0.7
+    aliases: ["1, 2, 3-Trichloropropane", 3-TCP", "123-TCP", "TCP"]
+  - id: tce
+    name: Trichloroethylene (TCE)
+    group: organic
+    unit: ppb
+    threshold: 5
+    threshold_type: MCL
+    phg: 1.7
+    aliases: ["Trichloroethylene", "TCE", "Trichloroethene"]
+  - id: pce
+    name: Tetrachloroethylene (PCE)
+    group: organic
+    unit: ppb
+    threshold: 5
+    threshold_type: MCL
+    phg: 0.06
+    aliases: ["Tetrachloroethylene", "PCE", "Tetrachloroethene", "Perchloroethylene"]
+  - id: dce_11
+    name: 1,1-Dichloroethylene
+    group: organic
+    unit: ppb
+    threshold: 6
+    threshold_type: MCL
+    phg: 10
+    aliases: ["1, 1-Dichloroethylene", 1-DCE", 1-Dichloroethene"]
+  - id: dce_cis_12
+    name: cis-1,2-Dichloroethylene
+    group: organic
+    unit: ppb
+    threshold: 6
+    threshold_type: MCL
+    phg: 13
+    aliases: ["cis-1, 2-Dichloroethylene", 2-DCE", 2-Dichloroethene"]
+  - id: carbon_tetrachloride
+    name: Carbon tetrachloride
+    group: organic
+    unit: ppb
+    threshold: 0.5
+    threshold_type: MCL
+    phg: 0.1
+    aliases: ["Carbon tetrachloride"]
+  - id: benzene
+    name: Benzene
+    group: organic
+    unit: ppb
+    threshold: 1
+    threshold_type: MCL
+    phg: 0.15
+    aliases: [Benzene]
+  - id: mtbe
+    name: MTBE
+    group: organic
+    unit: ppb
+    threshold: 13
+    threshold_type: MCL
+    phg: 13
+    aliases: ["MTBE", "Methyl tert-butyl ether", "Methyl-t-butyl ether"]
+  - id: dbcp
+    name: DBCP
+    group: organic
+    unit: ppt
+    threshold: 200
+    threshold_type: MCL
+    phg: 3
+    aliases: ["DBCP", "1, 2-Dibromo-3-chloropropane", "Dibromochloropropane"]
+  - id: atrazine
+    name: Atrazine
+    group: organic
+    unit: ppb
+    threshold: 1
+    threshold_type: MCL
+    phg: 0.15
+    aliases: [Atrazine]
+  - id: dichloromethane
+    name: Dichloromethane
+    group: organic
+    unit: ppb
+    threshold: 5
+    threshold_type: MCL
+    phg: 4
+    aliases: ["Dichloromethane", "Methylene chloride"]
+  - id: toluene
+    name: Toluene
+    group: organic
+    unit: ppb
+    threshold: 150
+    threshold_type: MCL
+    phg: 150
+    aliases: [Toluene]
+  - id: xylenes
+    name: Xylenes (total)
+    group: organic
+    unit: ppb
+    threshold: 1750
+    threshold_type: MCL
+    phg: 1800
+    aliases: [Xylenes, "Xylenes (total)", "Total xylenes"]
+  - id: dioxane_14
+    name: 1,4-Dioxane
+    group: organic
+    unit: ppb
+    threshold: 1
+    threshold_type: NL
+    phg: null
+    aliases: ["1, 4-Dioxane", 4 Dioxane"]
+  - id: tba
+    name: tert-Butyl alcohol (TBA)
+    group: organic
+    unit: ppb
+    threshold: 12
+    threshold_type: NL
+    phg: null
+    aliases: ["TBA", "tert-Butyl alcohol", "Tertiary butyl alcohol"]
+  - id: nmor
+    name: N-nitrosomorpholine
+    group: organic
+    unit: ppt
+    threshold: null
+    threshold_type: NONE
+    phg: null
+    aliases: ["N-nitrosomorpholine", "NMOR"]
+  - id: ndma
+    name: NDMA
+    group: organic
+    unit: ppt
+    threshold: 10
+    threshold_type: NL
+    phg: 3
+    aliases: ["NDMA", "N-Nitrosodimethylamine"]
+
+  # ---------------- PFAS ----------------
+  - id: pfoa
+    name: PFOA
+    group: pfas
+    unit: ppt
+    threshold: 4
+    threshold_type: MCL
+    phg: 0.007
+    aliases: ["PFOA", "Perfluorooctanoic acid"]
+    notes: "Federal MCL 4.0 ppt (2024); California notification level 5.1 ppt, response level 10 ppt."
+  - id: pfos
+    name: PFOS
+    group: pfas
+    unit: ppt
+    threshold: 4
+    threshold_type: MCL
+    phg: 1
+    aliases: ["PFOS", "Perfluorooctanesulfonic acid", "Perfluorooctane sulfonic acid"]
+    notes: "Federal MCL 4.0 ppt (2024); California notification level 6.5 ppt, response level 40 ppt."
+  - id: pfhxs
+    name: PFHxS
+    group: pfas
+    unit: ppt
+    threshold: 3
+    threshold_type: NL
+    phg: null
+    aliases: ["PFHxS", "Perfluorohexanesulfonic acid", "Perfluorohexane sulfonic acid"]
+    notes: "California notification level 3 ppt, response level 20 ppt. Federal MCL 10 ppt (2024)."
+  - id: pfbs
+    name: PFBS
+    group: pfas
+    unit: ppt
+    threshold: 500
+    threshold_type: NL
+    phg: null
+    aliases: ["PFBS", "Perfluorobutanesulfonic acid", "Perfluorobutane sulfonic acid"]
+  - id: pfna
+    name: PFNA
+    group: pfas
+    unit: ppt
+    threshold: 10
+    threshold_type: MCL
+    phg: null
+    aliases: ["PFNA", "Perfluorononanoic acid"]
+    notes: "Federal MCL 10 ppt (2024)."
+  - id: pfhxa
+    name: PFHxA
+    group: pfas
+    unit: ppt
+    threshold: null
+    threshold_type: NONE
+    phg: null
+    aliases: ["PFHxA", "Perfluorohexanoic acid"]
+  - id: pfbA
+    name: PFBA
+    group: pfas
+    unit: ppt
+    threshold: null
+    threshold_type: NONE
+    phg: null
+    aliases: ["PFBA", "Perfluorobutanoic acid"]
+  - id: pfhpa
+    name: PFHpA
+    group: pfas
+    unit: ppt
+    threshold: null
+    threshold_type: NONE
+    phg: null
+    aliases: ["PFHpA", "Perfluoroheptanoic acid"]
+  - id: pfpea
+    name: PFPeA
+    group: pfas
+    unit: ppt
+    threshold: null
+    threshold_type: NONE
+    phg: null
+    aliases: ["PFPeA", "Perfluoropentanoic acid"]
+  - id: pfas_total
+    name: PFAS (sum reported)
+    group: pfas
+    unit: ppt
+    threshold: null
+    threshold_type: NONE
+    phg: null
+    aliases: ["Total PFAS", "PFAS (total)", "Sum of PFAS"]
+
+  # ---------------- secondary (aesthetic) ----------------
+  - id: tds
+    name: Total dissolved solids
+    group: secondary
+    unit: ppm
+    threshold: 500
+    threshold_type: SMCL
+    phg: null
+    aliases: ["Total dissolved solids", "TDS", "Total Dissolved Solids (TDS)", "Dissolved solids"]
+    notes: "Recommended 500, upper 1000, short-term 1500 ppm."
+  - id: specific_conductance
+    name: Specific conductance
+    group: secondary
+    unit: uS/cm
+    threshold: 900
+    threshold_type: SMCL
+    phg: null
+    aliases: ["Specific conductance", "Conductivity", "Electrical conductivity", "EC"]
+    notes: "Recommended 900, upper 1600 uS/cm (umhos/cm)."
+  - id: chloride
+    name: Chloride
+    group: secondary
+    unit: ppm
+    threshold: 250
+    threshold_type: SMCL
+    phg: null
+    aliases: [Chloride]
+  - id: sulfate
+    name: Sulfate
+    group: secondary
+    unit: ppm
+    threshold: 250
+    threshold_type: SMCL
+    phg: null
+    aliases: [Sulfate, Sulphate]
+  - id: iron
+    name: Iron
+    group: secondary
+    unit: ppb
+    threshold: 300
+    threshold_type: SMCL
+    phg: null
+    aliases: [Iron]
+  - id: manganese
+    name: Manganese
+    group: secondary
+    unit: ppb
+    threshold: 50
+    threshold_type: SMCL
+    phg: null
+    aliases: [Manganese]
+  - id: zinc
+    name: Zinc
+    group: secondary
+    unit: ppm
+    threshold: 5
+    threshold_type: SMCL
+    phg: null
+    aliases: [Zinc]
+  - id: silver
+    name: Silver
+    group: secondary
+    unit: ppb
+    threshold: 100
+    threshold_type: SMCL
+    phg: null
+    aliases: [Silver]
+  - id: color
+    name: Color
+    group: secondary
+    unit: units
+    threshold: 15
+    threshold_type: SMCL
+    phg: null
+    aliases: [Color, Colour, "Color (apparent)"]
+  - id: odor
+    name: Odor threshold
+    group: secondary
+    unit: TON
+    threshold: 3
+    threshold_type: SMCL
+    phg: null
+    aliases: [Odor, "Odor threshold", "Odor-Threshold", "Odour"]
+  - id: mbas
+    name: Foaming agents (MBAS)
+    group: secondary
+    unit: ppm
+    threshold: 0.5
+    threshold_type: SMCL
+    phg: null
+    aliases: ["MBAS", "Foaming agents", "Foaming agents (MBAS)", "Surfactants"]
+  - id: ph
+    name: pH
+    group: secondary
+    unit: pH
+    threshold: 8.5
+    threshold_low: 6.5
+    threshold_type: RANGE
+    phg: null
+    aliases: [pH, "pH (field)", "pH (lab)"]
+    notes: "No California MCL; federal secondary range 6.5 to 8.5."
+
+  # ---------------- general (no standard) ----------------
+  - id: hardness
+    name: Hardness (as CaCO3)
+    group: general
+    unit: ppm
+    threshold: null
+    threshold_type: NONE
+    phg: null
+    aliases: ["Hardness", "Total hardness", "Hardness (as CaCO3)", "Hardness (total)", "Hardness as CaCO3"]
+    notes: "Sometimes reported in grains per gallon; 1 gpg = 17.1 ppm."
+  - id: sodium
+    name: Sodium
+    group: general
+    unit: ppm
+    threshold: null
+    threshold_type: NONE
+    phg: null
+    aliases: [Sodium, Na]
+  - id: calcium
+    name: Calcium
+    group: general
+    unit: ppm
+    threshold: null
+    threshold_type: NONE
+    phg: null
+    aliases: [Calcium, Ca]
+  - id: magnesium
+    name: Magnesium
+    group: general
+    unit: ppm
+    threshold: null
+    threshold_type: NONE
+    phg: null
+    aliases: [Magnesium, Mg]
+  - id: potassium
+    name: Potassium
+    group: general
+    unit: ppm
+    threshold: null
+    threshold_type: NONE
+    phg: null
+    aliases: [Potassium, K]
+  - id: alkalinity
+    name: Alkalinity (as CaCO3)
+    group: general
+    unit: ppm
+    threshold: null
+    threshold_type: NONE
+    phg: null
+    aliases: [Alkalinity, "Total alkalinity", "Alkalinity (as CaCO3)", total"]
+  - id: bicarbonate
+    name: Bicarbonate
+    group: general
+    unit: ppm
+    threshold: null
+    threshold_type: NONE
+    phg: null
+    aliases: [Bicarbonate, "Bicarbonate (HCO3)", "Bicarbonate alkalinity"]
+  - id: boron
+    name: Boron
+    group: general
+    unit: ppb
+    threshold: 1000
+    threshold_type: NL
+    phg: null
+    aliases: [Boron]
+  - id: vanadium
+    name: Vanadium
+    group: general
+    unit: ppb
+    threshold: 50
+    threshold_type: NL
+    phg: null
+    aliases: [Vanadium]
+  - id: strontium
+    name: Strontium
+    group: general
+    unit: ppb
+    threshold: null
+    threshold_type: NONE
+    phg: null
+    aliases: [Strontium]
+  - id: molybdenum
+    name: Molybdenum
+    group: general
+    unit: ppb
+    threshold: null
+    threshold_type: NONE
+    phg: null
+    aliases: [Molybdenum]
+  - id: lithium
+    name: Lithium
+    group: general
+    unit: ppb
+    threshold: null
+    threshold_type: NONE
+    phg: null
+    aliases: [Lithium]
+  - id: silica
+    name: Silica
+    group: general
+    unit: ppm
+    threshold: null
+    threshold_type: NONE
+    phg: null
+    aliases: [Silica, "Silica (SiO2)"]
+  - id: temperature
+    name: Temperature
+    group: general
+    unit: C
+    threshold: null
+    threshold_type: NONE
+    phg: null
+    aliases: [Temperature, "Temperature (C)", "Water temperature"]
+  - id: total_organic_carbon
+    name: Total organic carbon
+    group: general
+    unit: ppm
+    threshold: null
+    threshold_type: TT
+    phg: null
+    aliases: ["Total organic carbon", "TOC", "Total Organic Carbon (TOC)"]
