@@ -101,3 +101,47 @@ def test_real_data_builds_without_unknown_pwsids():
             assert v["status"] in {"value", "nd", "unconverted"}
             if v["status"] == "value":
                 assert v["value"] is not None and v["value"] >= 0, (pwsid, aid)
+
+
+REPO = Path(__file__).resolve().parents[2]
+
+
+def _entry(aid, raw, value, basis, unit="ppb", **kw):
+    e = {"id": aid, "raw_name": raw, "unit_raw": unit, "value": value, "value_basis": basis, "average": None,
+         "range_low": None, "range_high": None, "detected": value is not None, "mcl_printed": None, "phg_printed": None,
+         "source_group": None, "sample_year": 2025, "page": 1, "notes": None}
+    e.update(kw)
+    return e
+
+
+def test_average_beats_worst_single_result():
+    from src.pipeline.analytes import load_catalogue
+    from src.pipeline.build_site import select_value
+    cat = load_catalogue(REPO / "config" / "analytes.yaml")
+    a = cat["by_id"]["pfos"]
+    entries = [_entry("pfos", "PFOS", 3.2, "average", "ppt"), _entry("pfos", "PFOS", 6.2, "range_high", "ppt")]
+    out = select_value(a, entries, "X", [])
+    assert out["value"] == 3.2 and out["basis_tier"] == 1 and out["status"] == "value"
+
+
+def test_range_high_used_only_when_no_representative_figure():
+    from src.pipeline.analytes import load_catalogue
+    from src.pipeline.build_site import select_value
+    cat = load_catalogue(REPO / "config" / "analytes.yaml")
+    a = cat["by_id"]["nitrate_n"]
+    entries = [_entry("nitrate_n", "Nitrate", None, None, "ppm", detected=True, range_low=0, range_high=7.8)]
+    out = select_value(a, entries, "X", [])
+    assert out["value"] == 7.8 and out["basis"] == "range_high" and out["basis_tier"] == 2
+
+
+def test_lead_never_colored_by_a_single_tap_when_90th_percentile_exists():
+    from src.pipeline.analytes import load_catalogue
+    from src.pipeline.build_site import select_value
+    cat = load_catalogue(REPO / "config" / "analytes.yaml")
+    a = cat["by_id"]["lead"]
+    entries = [_entry("lead", "Lead", 2.1, "90th percentile"), _entry("lead", "Lead", 810, "highest single result")]
+    out = select_value(a, entries, "X", [])
+    assert out["value"] == 2.1
+    nd = [_entry("lead", "Lead", None, "90th percentile (printed < 5)", detected=True, range_low=0, range_high=41)]
+    out = select_value(a, nd, "X", [])
+    assert out["status"] == "nd" and out["value"] is None

@@ -24,6 +24,7 @@ import gzip
 import hashlib
 import io
 import json
+import math
 import re
 import sys
 import zipfile
@@ -110,6 +111,15 @@ def parse_number(raw: str) -> float | None:
         return float(s)
     except ValueError:
         return None
+
+
+def nearest_rank_percentile(values: list[float], pct: float) -> float | None:
+    """Nearest-rank percentile: the value at rank ceil(pct/100 * n) of the sorted values; None if empty."""
+    if not values:
+        return None
+    ordered = sorted(values)
+    rank = max(1, math.ceil(pct / 100.0 * len(ordered)))
+    return ordered[min(rank, len(ordered)) - 1]
 
 
 class Classified(NamedTuple):
@@ -208,14 +218,15 @@ def resolve_analyte(amap: dict, cat: dict, code: str, raw_name: str) -> tuple[st
 class Aggregate:
     """One (system, analyte key) accumulator."""
 
-    __slots__ = ("id", "n", "n_detected", "n_below_dlr", "sum", "max", "latest_date", "latest_values",
-                 "points", "point_types", "codes", "names", "units", "dlrs", "mcls")
+    __slots__ = ("id", "n", "n_detected", "n_below_dlr", "sum", "max", "detected_values", "latest_date",
+                 "latest_values", "points", "point_types", "codes", "names", "units", "dlrs", "mcls")
 
     def __init__(self, analyte_id: str | None) -> None:
         self.id = analyte_id
         self.n = self.n_detected = self.n_below_dlr = 0
         self.sum = 0.0
         self.max: float | None = None
+        self.detected_values: list[float] = []  # every detected result, for the 90th percentile
         self.latest_date: str | None = None
         self.latest_values: list[float] = []
         self.points: set[str] = set()
@@ -244,6 +255,7 @@ class Aggregate:
             self.n_detected += 1
             self.sum += c.value
             self.max = c.value if self.max is None else max(self.max, c.value)
+            self.detected_values.append(c.value)
         if date is not None:
             if self.latest_date is None or date > self.latest_date:
                 self.latest_date = date
@@ -265,6 +277,10 @@ class Aggregate:
             "latest_value": max(self.latest_values) if self.latest_values else None,
             "max": self.max,
             "mean_detected": round(self.sum / self.n_detected, 6) if self.n_detected else None,
+            # nearest-rank 90th percentile of the detected results (the statistic the lead/copper
+            # action level applies to, though over all points and the whole period here)
+            "p90": nearest_rank_percentile(self.detected_values, 90),
+            "p90_n": len(self.detected_values),
             "sampling_points": len(self.points),
             "point_types": dict(sorted(self.point_types.items())),
             "dlr": self.dlrs.most_common(1)[0][0] if self.dlrs else None,

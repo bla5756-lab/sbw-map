@@ -5,16 +5,20 @@
   "report": null,
   "sources_described": null,
   "search_log": [
-    "WebSearch \"Maria Lane Mutual Water\" Saratoga consumer confidence report OR water quality -> nothing about this system (results were Saratoga Springs, UT/NY)",
-    "WebSearch \"Maria Lane\" Saratoga mutual water company CA4300752 -> nothing about this system (closest hit was Mt Eden Mutual Water, a different Saratoga company)",
-    "No system website exists (Drinking Water Watch: no web address provided; 21141 Maria Lane, Saratoga, 408-799-3022; purchases all water from San Jose Water CA4310011)",
-    "Santa Clara County Dept. of Environmental Health: not the primacy agency for this system (regulated by SWRCB DDW District 17 per Drinking Water Watch); no county small-water-system CCR page found",
-    "Drinking Water Watch https://sdwis.waterboards.ca.gov/PDWW/JSP/WaterSystemDetail.jsp?tinwsys_is_number=13917&tinwsys_st_code=CA -> Consumer Confidence Reports menu: 2025, 2024, 2023, 2022, 2021 and 2020 all 'Report Not Available / Certification Not Available'",
-    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300752&Year=2025&isCert=false -> HTTP 404",
-    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300752&Year=2024&isCert=false -> HTTP 404",
-    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300752&Year=2023&isCert=false -> HTTP 404"
+    "WebSearch '\"Maria Lane Mutual Water\" Saratoga consumer confidence report OR water quality' -> no results for this system (hits were Saratoga Springs, UT/NY and unrelated mutual water companies); no system website",
+    "https://sdwis.waterboards.ca.gov/PDWW/JSP/SearchDispatch?number=CA4300752 -> https://sdwis.waterboards.ca.gov/PDWW/JSP/WaterSystemDetail.jsp?tinwsys_is_number=13917&tinwsys_st_code=CA&wsnumber=CA4300752 -> system page: community system, 12 residential connections, population 42, source 'SAN JOSE WATER WORKS' connection (purchases all water from CA4310011 San Jose Water), 21141 Maria Lane, Saratoga, admin phone 408-799-3022, 'No web address provided'; regulated by State Water Board DDW District 17 (Santa Clara)",
+    "https://sdwis.waterboards.ca.gov/PDWW/JSP/CCR.jsp?tinwsys_is_number=13917&tinwsys_st_code=CA&Year=2025 -> 'Report Not Available', 'Certification Not Available'",
+    "https://sdwis.waterboards.ca.gov/PDWW/JSP/CCR.jsp?tinwsys_is_number=13917&tinwsys_st_code=CA&Year=2024 -> 'Report Not Available'",
+    "https://sdwis.waterboards.ca.gov/PDWW/JSP/CCR.jsp?tinwsys_is_number=13917&tinwsys_st_code=CA&Year=2023 -> 'Report Not Available'",
+    "https://sdwis.waterboards.ca.gov/PDWW/JSP/CCR.jsp?tinwsys_is_number=13917&tinwsys_st_code=CA&Year=2022, 2021, 2020 -> 'Report Not Available' for every year",
+    "Santa Clara County Department of Environmental Health: no small-water-system CCR page found; the 'scceh.org' hits are Santa Cruz County; Drinking Water Watch shows the system is regulated directly by the State Water Board",
+    "Note: the system is a consecutive system buying all water from San Jose Water (CA4310011); San Jose Water's own CCR (data/ccr/CA4310011.json) describes that wholesale supply, but no report issued for PWSID CA4300752 was found",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300752&Year=2025&isCert=false (direct State Water Board EAR CCR upload link) -> HTTP 404 'File or directory not found' (no uploaded report)",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300752&Year=2024&isCert=false (direct State Water Board EAR CCR upload link) -> HTTP 404 'File or directory not found' (no uploaded report)",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300752&Year=2023&isCert=false (direct State Water Board EAR CCR upload link) -> HTTP 404 'File or directory not found' (no uploaded report)",
+    "Result: no Consumer Confidence Report for this system is published anywhere found online"
   ],
   "analytes": [],
   "violations": [],
-  "extraction_notes": "No Consumer Confidence Report for this system is published anywhere found online; the State Water Board has no CCR on file for 2020-2025. The system is a consecutive system buying all of its water from San Jose Water (CA4310011), whose own report covers the source water."
+  "extraction_notes": "No report found. Drinking Water Watch CCR pages for 2020-2025 all show 'Report Not Available' and the mutual has no website. Water is purchased entirely from San Jose Water, so the SJW report is the nearest available description of the supply, but it is not this system's CCR."
 }

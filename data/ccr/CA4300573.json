@@ -5,16 +5,19 @@
   "report": null,
   "sources_described": null,
   "search_log": [
-    "WebSearch \"Green Acres Mutual Water\" OR \"Sullivan Mutual Water\" Morgan Hill water quality report -> only aggregator listings (mytownview.com: 4 EPA violations, latest 2024-10-17) and the City of Morgan Hill CCR (different system); no report for Green Acres",
-    "WebSearch \"Green Acres Mutual Water\" Morgan Hill -> a 2011 CEQA notice for the Well 5a replacement project and the same aggregator; no CCR or water quality report",
-    "No system website exists (Drinking Water Watch: no web address provided; administrative contact 2110 Green Acres Lane, Morgan Hill, 408-779-2815; sources Well 06 and Well 08)",
-    "Santa Clara County Dept. of Environmental Health: not the primacy agency for this system (regulated by SWRCB DDW District 17 per Drinking Water Watch); no county small-water-system CCR page found",
-    "Drinking Water Watch https://sdwis.waterboards.ca.gov/PDWW/JSP/WaterSystemDetail.jsp?tinwsys_is_number=4204&tinwsys_st_code=CA -> Consumer Confidence Reports menu: 2025, 2024, 2023, 2022, 2021 and 2020 all 'Report Not Available / Certification Not Available'",
-    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300573&Year=2025&isCert=false -> HTTP 404",
-    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300573&Year=2024&isCert=false -> HTTP 404",
-    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300573&Year=2023&isCert=false -> HTTP 404"
+    "WebSearch '\"Green Acres Mutual Water\" OR \"Sullivan Mutual Water\" Morgan Hill water quality report' -> no report; only an aggregator directory listing (mytownview.com) and an unrelated 'Green Acres' (Eastern Municipal Water District) page; no system website found",
+    "https://sdwis.waterboards.ca.gov/PDWW/JSP/SearchDispatch?number=CA4300573 -> https://sdwis.waterboards.ca.gov/PDWW/JSP/WaterSystemDetail.jsp?tinwsys_is_number=4204&tinwsys_st_code=CA&wsnumber=CA4300573 -> system page: community system, 18 residential connections, population 53, groundwater (Well 06 and Well 08 active, Well 05 destroyed), 2110 Green Acres Lane, Morgan Hill, phone 408-779-2815, 'No web address provided'; regulated by State Water Board DDW District 17 (Santa Clara)",
+    "https://sdwis.waterboards.ca.gov/PDWW/JSP/CCR.jsp?tinwsys_is_number=4204&tinwsys_st_code=CA&Year=2025 -> 'Report Not Available', 'Certification Not Available'",
+    "https://sdwis.waterboards.ca.gov/PDWW/JSP/CCR.jsp?tinwsys_is_number=4204&tinwsys_st_code=CA&Year=2024 -> 'Report Not Available'",
+    "https://sdwis.waterboards.ca.gov/PDWW/JSP/CCR.jsp?tinwsys_is_number=4204&tinwsys_st_code=CA&Year=2023 -> 'Report Not Available'",
+    "https://sdwis.waterboards.ca.gov/PDWW/JSP/CCR.jsp?tinwsys_is_number=4204&tinwsys_st_code=CA&Year=2022, 2021, 2020 -> 'Report Not Available' for every year",
+    "Santa Clara County Department of Environmental Health: no small-water-system CCR page found (WebSearch 'Santa Clara County Department of Environmental Health small water systems consumer confidence report' and the sccgov.org variant); the 'scceh.org' small water system pages returned are Santa Cruz County's; Drinking Water Watch shows this system is regulated directly by the State Water Board, not a county local primacy agency",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300573&Year=2025&isCert=false (direct State Water Board EAR CCR upload link) -> HTTP 404 'File or directory not found' (no uploaded report)",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300573&Year=2024&isCert=false (direct State Water Board EAR CCR upload link) -> HTTP 404 'File or directory not found' (no uploaded report)",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300573&Year=2023&isCert=false (direct State Water Board EAR CCR upload link) -> HTTP 404 'File or directory not found' (no uploaded report)",
+    "Result: no Consumer Confidence Report for this system is published anywhere found online"
   ],
   "analytes": [],
   "violations": [],
-  "extraction_notes": "No Consumer Confidence Report for this system is published anywhere found online; the State Water Board has no CCR on file for 2020-2025."
+  "extraction_notes": "No report found. The State Water Board's Drinking Water Watch CCR pages for 2020-2025 all show 'Report Not Available' and the system has no website. A directory aggregator lists EPA-recorded violations for the system, but that is not a CCR and was not used."
 }

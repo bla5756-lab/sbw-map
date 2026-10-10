@@ -169,3 +169,9 @@ body[data-theme="light"] .sys{stroke:#0f172a;stroke-opacity:.45}
 .sys.selected{stroke:#38bdf8;stroke-opacity:1;stroke-width:2.5}
 .lbl{fill:#f1f5f9;font-family:var(--font);font-weight:600;pointer-events:none;paint-order:stroke;stroke:#0b1020;stroke-linejoin:round;text-anchor:middle}
 body[data-theme="light"] .lbl{fill:#0f172a;stroke:#fff}
+
+.clamp{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
+.clamp::after{content:" (more)";color:var(--accent)}
+details.notes summary{cursor:pointer;color:var(--muted);font-size:11px}
+details.notes p{margin:6px 0 0}
+.chip{max-width:520px}

@@ -61,6 +61,73 @@ def _entry_value(cat_analyte: dict, e: dict) -> float | None:
         return None
     return convert(v, e.get("unit_raw"), cat_analyte["unit"])
 
+TIER1_WORDS = ("90th", "average", "raa", "running annual", "monthly", "percent", "level detected", "level_detected",
+               "highest site", "highest location", "highest annual", "count", "number of", "mean")
+TIER2_WORDS = ("range", "single", "max", "highest", "result", "detected", "level")
+
+
+def basis_tier(e: dict) -> int:
+    """1 = the report's representative figure (average, 90th percentile, running annual average,
+    monthly percentage, or the plain 'level detected'); 2 = a worst single result or range end."""
+    b = (e.get("value_basis_effective") or e.get("value_basis") or "").lower()
+    if any(w in b for w in TIER1_WORDS):
+        return 1
+    if any(w in b for w in TIER2_WORDS):
+        return 2
+    return 1 if e.get("value") is not None else 2
+
+
+def select_value(a: dict, entries: list, pwsid: str, warnings: list) -> dict:
+    """Pick the entry that represents the system for analyte `a`.
+
+    Tier-1 entries win over tier-2 ones; within a tier the highest converted value wins (the worst
+    source column). Lead and copper never fall back to a single tap result when a 90th-percentile
+    entry exists, because the action level applies to the 90th percentile.
+    """
+    any_detected, unconverted = False, 0
+    for e in entries:
+        v = _entry_value(a, e)
+        e["value_converted"] = v
+        raw, basis = _effective(e)
+        if basis == "range_high":
+            e["value_basis_effective"] = "range_high"
+        e["basis_tier"] = basis_tier(e)
+        if raw is not None:
+            any_detected = True
+            if v is None:
+                unconverted += 1
+                warnings.append(f"{pwsid} {a['id']}: unit '{e.get('unit_raw')}' not convertible to {a['unit']}")
+    tiers = sorted({e["basis_tier"] for e in entries})
+    if a["group"] == "lead_copper" and any("90th" in (e.get("value_basis") or "").lower() for e in entries):
+        tiers = [1]
+    best, best_val = None, None
+    for tier in tiers:
+        for e in entries:
+            if e["basis_tier"] != tier:
+                continue
+            v = e["value_converted"]
+            if v is not None and (best_val is None or v > best_val):
+                best, best_val = e, v
+        if best is not None:
+            break
+    if best_val is not None:
+        status = "value"
+    elif any_detected and unconverted and (tiers == [1] or best is None):
+        status = "unconverted" if not (a["group"] == "lead_copper" and tiers == [1]) else "nd"
+    else:
+        status = "nd"
+    if a["group"] == "lead_copper" and tiers == [1] and best is None:
+        status = "nd"  # printed 90th percentile is ND / "<x": at the standard's own metric nothing was found
+    return {
+        "status": status,
+        "value": best_val,
+        "unit": a["unit"],
+        "basis": (best.get("value_basis_effective") or best.get("value_basis")) if best else None,
+        "basis_tier": best.get("basis_tier") if best else None,
+        "source_group": best.get("source_group") if best else None,
+        "entries": entries,
+    }
+
 
 def merge_ccr(systems: dict, cat: dict, ccr_dir: Path) -> list[str]:
     """Fold every data/ccr/<PWSID>.json into its system. Returns a list of warnings."""
@@ -93,34 +160,7 @@ def merge_ccr(systems: dict, cat: dict, ccr_dir: Path) -> list[str]:
             grouped.setdefault(aid, []).append(e)
         for aid, entries in grouped.items():
             a = cat["by_id"][aid]
-            best, best_val, any_detected, unconverted = None, None, False, 0
-            for e in entries:
-                v = _entry_value(a, e)
-                e["value_converted"] = v
-                raw, basis = _effective(e)
-                if basis == "range_high":
-                    e["value_basis_effective"] = "range_high"
-                if raw is not None:
-                    any_detected = True
-                    if v is None:
-                        unconverted += 1
-                        warnings.append(f"{pwsid} {aid}: unit '{e.get('unit_raw')}' not convertible to {a['unit']}")
-                if v is not None and (best_val is None or v > best_val):
-                    best, best_val = e, v
-            if best_val is not None:
-                status_v = "value"
-            elif any_detected and unconverted:
-                status_v = "unconverted"
-            else:
-                status_v = "nd"
-            sysrec["values"][aid] = {
-                "status": status_v,
-                "value": best_val,
-                "unit": a["unit"],
-                "basis": (best.get("value_basis_effective") or best.get("value_basis")) if best else None,
-                "source_group": best.get("source_group") if best else None,
-                "entries": entries,
-            }
+            sysrec["values"][aid] = select_value(a, entries, pwsid, warnings)
     return warnings
 
 
@@ -146,10 +186,12 @@ def attach_sdwis(systems: dict, cat: dict, sdwis_path: Path) -> dict | None:
             prev = lab.get(aid)
             if prev and (mx is None or (prev.get("max") or 0) >= (mx or 0)):
                 continue
+            p90 = convert(agg.get("p90"), unit, a["unit"], aid)
+            basis_val, basis = (p90, "p90") if (a["group"] == "lead_copper" and p90 is not None) else (mx, "max")
             lab[aid] = {
-                "status": "value" if (latest is not None or mx is not None) else ("nd" if agg.get("n") else "nd"),
-                "latest": latest, "max": mx, "unit": a["unit"], "n": agg.get("n"),
-                "n_detected": agg.get("n_detected"), "latest_date": agg.get("latest_date"),
+                "status": "value" if (latest is not None or mx is not None) else "nd",
+                "latest": latest, "max": mx, "p90": p90, "p90_n": agg.get("p90_n"), "basis_value": basis_val, "basis": basis,
+                "unit": a["unit"], "n": agg.get("n"), "n_detected": agg.get("n_detected"), "latest_date": agg.get("latest_date"),
                 "sampling_points": agg.get("sampling_points"), "raw_name": agg.get("raw_name"),
             }
         sysrec["lab"] = lab
@@ -169,7 +211,7 @@ def compute_ratios(systems: dict, cat: dict) -> None:
                 v["ratio"] = ratio_to_standard(a, v["value"], rel_max) if v["status"] == "value" else (0.0 if v["status"] == "nd" else None)
             lv = s.get("lab", {}).get(aid)
             if lv:
-                basis = lv["max"] if lv["max"] is not None else lv["latest"]
+                basis = lv.get("basis_value") if lv.get("basis_value") is not None else (lv["max"] if lv["max"] is not None else lv["latest"])
                 lv["ratio"] = ratio_to_standard(a, basis, rel_max_lab) if basis is not None else 0.0
 
 

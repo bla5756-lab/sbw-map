@@ -38,8 +38,15 @@ const $ = (sel) => document.querySelector(sel);
 const el = (tag, cls, html) => { const n = document.createElement(tag); if (cls) n.className = cls; if (html != null) n.innerHTML = html; return n; };
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+const DISPLAY_NAMES = {
+  CA4310011: 'San Jose Water Company', CA4310018: 'Cupertino (operated by San Jose Water)', CA4310020: 'San Jose Municipal Water: Evergreen / Edenvale / Coyote',
+  CA4310019: 'San Jose Municipal Water: North San Jose / Alviso', CA4310001: 'Cal Water: Los Altos District', CA4310022: 'Great Oaks Water Company',
+  CA4300543: 'Cal Am: West San Martin', CA4300909: 'Lick Observatory (UC Santa Cruz)', CA4310021: 'Purissima Hills Water District', CA4300997: 'NASA Ames Research Center',
+};
+function displayName(sys) { return DISPLAY_NAMES[sys.pwsid] || titleCase(sys.name); }
 function titleCase(name) {
   if (!name) return '';
+  if (name.includes('/')) return name.split('/').map((part) => titleCase(part.trim())).join(' / ');
   return name.split(/\s+/).map((w) => {
     const bare = w.replace(/[^A-Z0-9'.-]/gi, '');
     if (KEEP_UPPER.has(bare.toUpperCase().replace(/\./g, ''))) return w.toUpperCase();
@@ -95,7 +102,7 @@ function scoreSystem(sys) {
   const lab = sys.lab;
   if (!lab || !Object.keys(lab).length) return { kind: 'no_report', items: [] };
   if (!ids.length) return { kind: 'none', items: [] };
-  const items = ids.map((id) => lab[id] && { id, ...lab[id], value: lab[id].max ?? lab[id].latest }).filter(Boolean);
+  const items = ids.map((id) => lab[id] && { id, ...lab[id], value: lab[id].basis_value ?? lab[id].max ?? lab[id].latest }).filter(Boolean);
   if (!items.length) return { kind: 'not_in_report', items: [] };
   return finish(items, items.every((it) => !it.n_detected));
 }
@@ -213,7 +220,7 @@ function prepareGeo() {
     f.properties.area = geomArea(f.geometry);
     f.properties.sortkey = -f.properties.area; // small systems draw on top
     f.properties.population = sys.population || 0;
-    f.properties.label = titleCase(sys.name);
+    f.properties.label = displayName(sys);
     S.byFid.set(f.properties.fid, f);
     S.labels.features.push({ type: 'Feature', id: f.properties.fid, properties: { fid: f.properties.fid, label: f.properties.label, population: f.properties.population, visible: true }, geometry: { type: 'Point', coordinates: labelPoint(f.geometry) } });
   }
@@ -252,7 +259,7 @@ async function initMap() {
   const style = await styleFor(S.theme);
   const map = new maplibregl.Map({ container: 'map', style, center: [-121.86, 37.26], zoom: 9.6, minZoom: 7, maxZoom: 16, attributionControl: { compact: true }, hash: false });
   S.map = map;
-  setTimeout(() => { if (!S.ready) { notice('The basemap did not finish loading; switching to a plain background.', true); S.offline = true; map.setStyle(offlineStyle(S.theme)); } }, 12000);
+  setTimeout(() => { if (!S.ready) { notice('The basemap did not finish loading; switching to a plain background.', true); S.offline = true; map.setStyle(offlineStyle(S.theme), { diff: false }); } }, 12000);
   map.addControl(new maplibregl.NavigationControl({ visualizePitch: false }), 'bottom-right');
   map.addControl(new maplibregl.ScaleControl({ unit: 'imperial' }), 'bottom-right');
   map.on('style.load', () => { addLayers(); S.ready = true; recolor(); $('#loading').classList.add('hidden'); });
@@ -283,7 +290,7 @@ function setTheme(theme) {
   $('#btn-theme').textContent = theme === 'dark' ? 'Light basemap' : 'Dark basemap';
   try { localStorage.setItem('sbw-theme', theme); } catch (_) { /* private mode */ }
   if (S.svg) { svgRecolor(); return; }
-  if (S.map) { S.ready = false; styleFor(theme).then((st) => S.map.setStyle(st)); }
+  if (S.map) { S.ready = false; styleFor(theme).then((st) => S.map.setStyle(st, { diff: false })); }
 }
 
 /* ---------- SVG fallback renderer (no WebGL) ---------- */
@@ -378,14 +385,15 @@ function renderTooltip(sys) {
   const sc = scoreSystem(sys);
   const tip = $('#tooltip');
   const yr = sys.report?.data_year ? ` · ${sys.report.data_year} report` : '';
-  let html = `<h4>${esc(titleCase(sys.name))}</h4><div class="sub">${esc(sys.pwsid)} · ${esc((sys.classification || '').toLowerCase())} · pop ${sys.population?.toLocaleString() ?? '—'}${yr}</div>`;
+  let html = `<h4>${esc(displayName(sys))}</h4><div class="sub">${esc(sys.pwsid)} · ${esc((sys.classification || '').toLowerCase())} · pop ${sys.population?.toLocaleString() ?? '—'}${yr}</div>`;
   html += statusText(sys, sc);
   for (const it of sc.items.slice(0, 7)) {
     const a = analyte(it.id);
     const detected = S.source === 'ccr' ? it.status !== 'nd' : !!it.n_detected;
     const val = detected ? `${fmt(it.value)} ${a.unit}` : 'ND';
     const col = detected ? rampColor(it.ratio) : KIND_COLOR.nd;
-    html += `<div class="tt-row"><span>${esc(a.name)}</span><span class="num" style="color:${col}">${val}${detected && it.ratio != null && a.threshold_type !== 'NONE' ? ` · ${pct(it.ratio)}` : ''}</span></div>`;
+    const hint = S.source === 'ccr' && detected && it.basis_tier === 2 ? ' (worst single result)' : '';
+    html += `<div class="tt-row"><span>${esc(a.name)}<span class="sub" style="display:inline;margin:0">${hint}</span></span><span class="num" style="color:${col}">${val}${detected && it.ratio != null && a.threshold_type !== 'NONE' ? ` · ${pct(it.ratio)}` : ''}</span></div>`;
   }
   if (sc.items.length > 7) html += `<div class="sub">+${sc.items.length - 7} more</div>`;
   html += '<div class="sub" style="margin-top:6px">Click for the full report</div>';
@@ -397,14 +405,14 @@ function openDetail(pwsid, fid) {
   const d = $('#detail'); const b = $('#detail-body');
   const r = sys.report || {};
   const pill = `<span class="pill ${r.status}">${r.status === 'found' ? `Report found · ${r.data_year ?? ''}` : r.status === 'not_required' ? 'No report required' : 'No report found'}</span>`;
-  let html = `<h2>${esc(titleCase(sys.name))}</h2><p class="sub">${esc(sys.pwsid)} · ${esc(titleCase(sys.classification || ''))} · ${esc(titleCase(sys.city || ''))} · pop ${sys.population?.toLocaleString() ?? '—'} · ${sys.connections?.toLocaleString() ?? '—'} connections</p>${pill}`;
+  let html = `<h2>${esc(displayName(sys))}</h2><p class="sub">${esc(sys.pwsid)} · ${esc(titleCase(sys.classification || ''))} · ${esc(titleCase(sys.city || ''))} · pop ${sys.population?.toLocaleString() ?? '—'} · ${sys.connections?.toLocaleString() ?? '—'} connections</p>${pill}`;
   html += '<div class="card"><h3>Consumer Confidence Report</h3>';
   if (r.status === 'found') {
     html += `<div class="report-actions">${r.file ? `<a class="btn-primary" href="/${esc(r.file)}" target="_blank" rel="noopener">Open the ${esc(r.data_year ?? '')} report ${r.format === 'html' ? '' : '(PDF)'}</a>` : ''}${r.url ? `<a class="btn" href="${esc(r.url)}" target="_blank" rel="noopener">Original source</a>` : ''}</div>`;
     html += `<div class="kv"><span>Title</span><span>${esc(r.title || '—')}</span><span>Data year</span><span>${esc(r.data_year ?? '—')}</span><span>Document</span><span>${r.file ? `<a href="/${esc(r.file)}" target="_blank" rel="noopener">open saved copy</a>` : '—'}${r.url ? ` · <a href="${esc(r.url)}" target="_blank" rel="noopener">source</a>` : ''}</span><span>Retrieved</span><span>${esc(r.retrieved || '—')}</span></div>`;
-    if (r.sources_described) html += `<p><b>Water sources:</b> ${esc(r.sources_described)}</p>`;
+    if (r.sources_described) html += `<p class="clamp" data-clamp><b>Water sources:</b> ${esc(r.sources_described)}</p>`;
     if (r.violations?.length) html += '<p><b>Violations / exceedances disclosed:</b></p>' + r.violations.map((v) => `<div class="violation">${esc(v)}</div>`).join('');
-    if (r.extraction_notes) html += `<p class="mono">${esc(r.extraction_notes)}</p>`;
+    if (r.extraction_notes) html += `<details class="notes"><summary>Extraction notes</summary><p class="mono">${esc(r.extraction_notes)}</p></details>`;
   } else if (r.status === 'not_required') {
     html += '<p>Non-community water systems (parks, schools, hospitals, workplaces) are not required to publish an annual Consumer Confidence Report. Their monitoring still appears under <b>State lab results</b>.</p>';
   } else {
@@ -416,6 +424,7 @@ function openDetail(pwsid, fid) {
   html += `<div class="tabs"><button class="tab ${S.source === 'ccr' ? 'active' : ''}" data-tab="ccr">Report values</button><button class="tab ${S.source === 'lab' ? 'active' : ''}" data-tab="lab" ${hasLab ? '' : 'disabled title="no lab results on file"'}>State lab results${hasLab ? ` (${Object.keys(sys.lab).length})` : ''}</button></div>`;
   html += `<div id="tab-ccr" class="${S.source === 'ccr' ? '' : 'hidden'}">${renderCcrTable(sys)}</div><div id="tab-lab" class="${S.source === 'lab' ? '' : 'hidden'}">${renderLabTable(sys)}</div>`;
   b.innerHTML = html;
+  b.querySelectorAll('[data-clamp]').forEach((p) => p.addEventListener('click', () => p.classList.toggle('clamp')));
   b.querySelectorAll('.tab').forEach((t) => t.addEventListener('click', () => {
     if (t.disabled) return;
     b.querySelectorAll('.tab').forEach((x) => x.classList.toggle('active', x === t));
@@ -467,7 +476,8 @@ function renderLabTable(sys) {
     for (const [a, v] of rows) {
       const det = !!v.n_detected;
       const bar = det && v.ratio != null && a.threshold_type !== 'NONE' ? `<div class="bar"><i style="width:${Math.min(100, v.ratio * 100)}%;background:${rampColor(v.ratio)}"></i></div>` : '';
-      html += `<tr><td><b>${esc(a.name)}</b><div class="sub" style="margin:0">${esc(stdLabel(a))}</div></td><td class="num">${det ? `${fmt(v.max)} ${a.unit}` : 'ND'}${bar}</td><td class="num">${v.latest != null ? `${fmt(v.latest)} ${a.unit}` : 'ND'}<div class="sub" style="margin:0">${esc(v.latest_date || '')}</div></td><td class="num">${v.n_detected ?? 0}/${v.n ?? 0}${v.sampling_points ? `<div class="sub" style="margin:0">${v.sampling_points} pts</div>` : ''}</td></tr>`;
+      const lc = a.group === 'lead_copper' && v.p90 != null;
+      html += `<tr><td><b>${esc(a.name)}</b><div class="sub" style="margin:0">${esc(stdLabel(a))}${lc ? ' · colored by 90th percentile of tap samples' : ''}</div></td><td class="num">${det ? `${lc ? `${fmt(v.p90)} ${a.unit} <span class="sub">p90</span><div class="sub" style="margin:0">max ${fmt(v.max)}</div>` : `${fmt(v.max)} ${a.unit}`}` : 'ND'}${bar}</td><td class="num">${v.latest != null ? `${fmt(v.latest)} ${a.unit}` : 'ND'}<div class="sub" style="margin:0">${esc(v.latest_date || '')}</div></td><td class="num">${v.n_detected ?? 0}/${v.n ?? 0}${v.sampling_points ? `<div class="sub" style="margin:0">${v.sampling_points} pts</div>` : ''}</td></tr>`;
     }
     html += '</tbody></table></div>';
   }
@@ -519,7 +529,7 @@ function renderMode() {
   const src = S.source === 'ccr' ? 'Consumer reports' : 'State lab results';
   if (S.solo) { const a = analyte(S.solo); chip.innerHTML = `${esc(src)} · <b>${esc(a.name)}</b> · ${esc(stdLabel(a))}`; return; }
   const n = S.enabled.size;
-  chip.innerHTML = n ? `${esc(src)} · <b>composite of ${n} analyte${n === 1 ? '' : 's'}</b> · worst fraction of standard` : `${esc(src)} · <b>no analyte selected</b>`;
+  chip.innerHTML = n ? `${esc(src)} · <b>composite of ${n} analyte${n === 1 ? '' : 's'}</b> · worst % of standard` : `${esc(src)} · <b>no analyte selected</b>`;
 }
 function renderLegend() {
   const t = $('#legend-title'), note = $('#legend-note');
@@ -607,10 +617,10 @@ function renderReports() {
   html += '<table class="vals"><thead><tr><th>Water system</th><th>Population</th><th>Report</th><th></th></tr></thead><tbody>';
   for (const s of found) {
     const r = s.report;
-    html += `<tr><td><b>${esc(titleCase(s.name))}</b><div class="sub" style="margin:0">${esc(s.pwsid)}</div></td><td class="num">${s.population?.toLocaleString() ?? '—'}</td><td>${esc(r.data_year ?? '')} · ${esc((r.format || 'pdf').toUpperCase())}${r.pages ? ` · ${r.pages} pp` : ''}</td><td class="num">${r.file ? `<a class="btn-primary small-btn" href="/${esc(r.file)}" target="_blank" rel="noopener">Open</a>` : ''} ${r.url ? `<a class="link" href="${esc(r.url)}" target="_blank" rel="noopener">source</a>` : ''} <button class="link" data-detail="${esc(s.pwsid)}">map</button></td></tr>`;
+    html += `<tr><td><b>${esc(displayName(s))}</b><div class="sub" style="margin:0">${esc(s.pwsid)}</div></td><td class="num">${s.population?.toLocaleString() ?? '—'}</td><td>${esc(r.data_year ?? '')} · ${esc((r.format || 'pdf').toUpperCase())}${r.pages ? ` · ${r.pages} pp` : ''}</td><td class="num">${r.file ? `<a class="btn-primary small-btn" href="/${esc(r.file)}" target="_blank" rel="noopener">Open</a>` : ''} ${r.url ? `<a class="link" href="${esc(r.url)}" target="_blank" rel="noopener">source</a>` : ''} <button class="link" data-detail="${esc(s.pwsid)}">map</button></td></tr>`;
   }
   html += '</tbody></table>';
-  if (missing.length) html += `<details style="margin-top:12px"><summary class="sub">Community systems with no locatable report (${missing.length})</summary><ul class="search-log">${missing.map((s) => `<li>${esc(titleCase(s.name))} (${esc(s.pwsid)}, pop ${s.population?.toLocaleString() ?? '—'})</li>`).join('')}</ul></details>`;
+  if (missing.length) html += `<details style="margin-top:12px"><summary class="sub">Community systems with no locatable report (${missing.length})</summary><ul class="search-log">${missing.map((s) => `<li>${esc(displayName(s))} (${esc(s.pwsid)}, pop ${s.population?.toLocaleString() ?? '—'})</li>`).join('')}</ul></details>`;
   body.innerHTML = html;
   body.querySelectorAll('[data-detail]').forEach((b) => b.addEventListener('click', () => { $('#reports').classList.add('hidden'); const s = S.site.systems[b.dataset.detail]; openDetail(s.pwsid, s.fid); }));
 }

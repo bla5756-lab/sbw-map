@@ -901,8 +901,7 @@ analytes:
 - storet: '2819'
   raw_name: PERFLUOROBUTANOIC ACID (PFBA)
   unit: NG/L
-  id: pfbA
-  notes: Catalogue id is spelled pfbA (capital A) in config/analytes.yaml.
+  id: pfba
 - storet: '2820'
   raw_name: PERFLUOROOCTANE SULFONIC ACID 6:2 FTS
   unit: NG/L

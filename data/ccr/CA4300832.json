@@ -5,16 +5,19 @@
   "report": null,
   "sources_described": null,
   "search_log": [
-    "WebSearch \"South County Retirement Home\" San Martin water system -> only a tapwaterdata aggregator listing (no report, no results on file) and LAFCO/CPUC documents about other San Martin water systems",
-    "WebSearch \"South County Retirement Home\" OR \"South County Retirement\" San Martin \"consumer confidence report\" OR CA4300832 -> nothing about this system",
-    "No system website exists (Drinking Water Watch: no web address provided; 460 Church Avenue, San Martin, 408-683-0229; one well, institutional service area)",
-    "Santa Clara County Dept. of Environmental Health: not the primacy agency for this system (regulated by SWRCB DDW District 17 per Drinking Water Watch); no county small-water-system CCR page found",
-    "Drinking Water Watch https://sdwis.waterboards.ca.gov/PDWW/JSP/WaterSystemDetail.jsp?tinwsys_is_number=4286&tinwsys_st_code=CA -> Consumer Confidence Reports menu: 2025, 2024, 2023, 2022, 2021 and 2020 all 'Report Not Available / Certification Not Available'",
-    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300832&Year=2025&isCert=false -> HTTP 404",
-    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300832&Year=2024&isCert=false -> HTTP 404",
-    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300832&Year=2023&isCert=false -> HTTP 404"
+    "WebSearch '\"South County Retirement Home\" San Martin water system' -> no report; a tapwaterdata.com aggregator listing (https://www.tapwaterdata.com/utilities/ca/south-county-retirement-home, no CCR link) and unrelated LAFCO/CPUC documents about West San Martin Water Works and San Martin County Water District; no website for the home's water system",
+    "https://sdwis.waterboards.ca.gov/PDWW/JSP/SearchDispatch?number=CA4300832 -> https://sdwis.waterboards.ca.gov/PDWW/JSP/WaterSystemDetail.jsp?tinwsys_is_number=4286&tinwsys_st_code=CA&wsnumber=CA4300832 -> system page: community system serving an institution, 3 residential (unmetered) connections, population 46, groundwater Well 01, 460 Church Avenue, San Martin, phone 408-683-0229, 'No web address provided'; regulated by State Water Board DDW District 17 (Santa Clara)",
+    "https://sdwis.waterboards.ca.gov/PDWW/JSP/CCR.jsp?tinwsys_is_number=4286&tinwsys_st_code=CA&Year=2025 -> 'Report Not Available', 'Certification Not Available'",
+    "https://sdwis.waterboards.ca.gov/PDWW/JSP/CCR.jsp?tinwsys_is_number=4286&tinwsys_st_code=CA&Year=2024 -> 'Report Not Available'",
+    "https://sdwis.waterboards.ca.gov/PDWW/JSP/CCR.jsp?tinwsys_is_number=4286&tinwsys_st_code=CA&Year=2023 -> 'Report Not Available'",
+    "https://sdwis.waterboards.ca.gov/PDWW/JSP/CCR.jsp?tinwsys_is_number=4286&tinwsys_st_code=CA&Year=2022, 2021, 2020 -> 'Report Not Available' for every year",
+    "Santa Clara County Department of Environmental Health: no small-water-system CCR page found; the 'scceh.org' hits are Santa Cruz County; Drinking Water Watch shows the system is regulated directly by the State Water Board",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300832&Year=2025&isCert=false (direct State Water Board EAR CCR upload link) -> HTTP 404 'File or directory not found' (no uploaded report)",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300832&Year=2024&isCert=false (direct State Water Board EAR CCR upload link) -> HTTP 404 'File or directory not found' (no uploaded report)",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300832&Year=2023&isCert=false (direct State Water Board EAR CCR upload link) -> HTTP 404 'File or directory not found' (no uploaded report)",
+    "Result: no Consumer Confidence Report for this system is published anywhere found online"
   ],
   "analytes": [],
   "violations": [],
-  "extraction_notes": "No Consumer Confidence Report for this system is published anywhere found online; the State Water Board has no CCR on file for 2020-2025."
+  "extraction_notes": "No report found. Drinking Water Watch CCR pages for 2020-2025 all show 'Report Not Available'; the system (a retirement home on its own well) has no website."
 }

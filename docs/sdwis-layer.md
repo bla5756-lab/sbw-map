@@ -23,8 +23,10 @@ samples and disinfection-byproduct samples). They are not compliance determinati
 
 Downloaded 2026-10-10 into `~/southbay-water-raw/` (outside the repo). Both `.tab` members are
 stamped 2026-07-23 05:10 inside the zips and the newest sample in SDWIS5 is 2026-07-14, although
-the page says SDWIS5 was "last update September 15, 2026" - the copy in hand is the July build;
-re-download before the next refresh. SHA-256 of each zip is recorded in the results JSON.
+the page says SDWIS5 was "last update September 15, 2026". A fresh download on 2026-10-10 returned
+a byte-identical file (same SHA-256; the server reports `Last-Modified: 15 Sep 2026` but the
+content is the July build), so the layer ends at 2026-07-14 until the state posts a newer build.
+SHA-256 of each zip is recorded in the results JSON.
 
 ## Running it
 
@@ -33,8 +35,8 @@ python3 -I src/pipeline/sdwis_extract.py ~/southbay-water-raw/SDWIS4.zip ~/south
 ```
 (`-I` because the archives are untrusted data; defaults point at `data/boundaries.geojson`,
 `config/analytes.yaml`, `src/pipeline/sdwis_analytes.yaml` and `data/sdwis/`.) Runtime about
-3 minutes; the `.tab` members are streamed line by line out of the zips, never unpacked or held in
-memory. Tests: `python3 -m pytest tests/pipeline_tests/test_sdwis_extract.py -q` (on zgx the
+10 seconds on zgx, a few minutes on a slow disk; the `.tab` members are streamed line by line out
+of the zips, never unpacked or held in memory. Tests: `python3 -m pytest tests/pipeline_tests/test_sdwis_extract.py -q` (on zgx the
 ROS `launch_testing` pytest plugin on `PYTHONPATH` breaks collection; run with `env -u PYTHONPATH`).
 
 Outputs
@@ -48,10 +50,13 @@ Outputs
   `sampling_points`, `point_types` and `analytes`, keyed by canonical id when mapped, otherwise by
   the raw analyte name. Each analyte entry: `id`, `raw_name`, `storet` (Analyte Code), `unit` (as
   in the data), `n`, `n_detected`, `n_below_dlr`, `latest_date`, `latest_value`, `max`,
-  `mean_detected`, `sampling_points`, `point_types`, `dlr`, `mcl`, plus `other_storets` when two
-  codes fold into one id and `units_seen` when a key carries more than one unit (none do today).
-  `latest_value` is the highest detected value among the rows dated `latest_date`, or null when
-  the latest sample was a non-detect.
+  `mean_detected`, `p90`, `p90_n`, `sampling_points`, `point_types`, `dlr`, `mcl`, plus
+  `other_storets` when two codes fold into one id and `units_seen` when a key carries more than
+  one unit (none do today). `latest_value` is the highest detected value among the rows dated
+  `latest_date`, or null when the latest sample was a non-detect. `p90` is the nearest-rank 90th
+  percentile of the detected results (the value at rank ceil(0.9 x n) of the sorted detections),
+  null when nothing was detected; `p90_n` is the number of detections it was computed from
+  (always equal to `n_detected`).
 
 ## Columns
 
@@ -102,7 +107,7 @@ In these files the flag and the result are perfectly aligned: every `Y` row has 
    layer follows that; the numbers survive in the TSV if the lead prefers to use them.
 5. Everything else is a detection (24,852 rows). Values are used as reported.
 
-`max` and `mean_detected` are over detections only; `n` counts every row.
+`max`, `mean_detected` and `p90` are over detections only; `n` counts every row.
 
 ## Analyte mapping (`src/pipeline/sdwis_analytes.yaml`)
 
@@ -129,7 +134,6 @@ Decisions worth knowing:
 - Mapped ids never detected in any system: antimony, atrazine, benzene, beryllium, bromate,
   carbon_tetrachloride, chlorite, cyanide, dbcp, dce_cis_12, dichloromethane, dioxane_14,
   gross_beta, lithium, mercury, mtbe, nitrite_n, radium_226, tce, tcp_123, thallium, xylenes.
-- The catalogue spells one id `pfbA` (capital A); the map uses it as given.
 
 ## Coverage
 
@@ -152,10 +156,15 @@ Decisions worth knowing:
 
 ## Caveats
 
-- **Lead and copper are individual tap samples, not the 90th percentile** that the action level
-  applies to. San Jose Water's `max` lead is 810 UG/L (one tap, 2025-09-05) and `build_site`
-  currently colours by `max`, which would show 54x the action level. Either compute a 90th
-  percentile per monitoring period from the TSV or colour lead/copper by `latest_value`/`mean`.
+- **Lead and copper are individual tap samples**; the action level applies to the 90th percentile
+  of a monitoring period's tap samples, not to any single result. San Jose Water's `max` lead is
+  810 UG/L (one tap, 2025-09-05), 54x the action level, while its `p90` is 5.9 UG/L (60 detections
+  of 361 tap samples) and its copper `p90` is 780 UG/L (231 of 381). Colour lead and copper by
+  `p90`, not `max`. Two differences from the regulatory statistic remain: `p90` ranks detected
+  results only (the rule ranks every sample, non-detects as the lowest values, so `p90` is the
+  higher of the two whenever there are non-detects), and it spans all points and the whole
+  2023-2026 period rather than one monitoring period. A per-period, all-sample 90th percentile can
+  be computed from the TSV (`Less Than Reporting Level`, `Sample Date`, `PS Code`).
 - Raw-water results dominate (81% of rows are wells and intakes). A well's result is not what
   customers drink: sources may be treated, blended or unused. The per-analyte `point_types`
   tells how much of each aggregate is distribution (`DS`) versus source water.

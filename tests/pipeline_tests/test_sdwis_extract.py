@@ -134,6 +134,15 @@ def test_classify_result(result, flag, dlr, detected, kind):
     assert (c.value is not None) == detected
 
 
+def test_nearest_rank_percentile():
+    assert sx.nearest_rank_percentile([], 90) is None
+    assert sx.nearest_rank_percentile([5.0], 90) == 5.0
+    assert sx.nearest_rank_percentile([2.0, 1.0], 90) == 2.0            # ceil(1.8) = rank 2
+    assert sx.nearest_rank_percentile(list(range(1, 11)), 90) == 9       # ceil(9.0) = rank 9 of 10
+    assert sx.nearest_rank_percentile([float(v) for v in range(20, 0, -1)], 90) == 18.0   # unsorted input
+    assert sx.nearest_rank_percentile([1.0, 2.0, 3.0], 100) == 3.0
+
+
 def test_parse_sample_date():
     assert sx.parse_sample_date("09-03-2024") == "2024-09-03"
     assert sx.parse_sample_date("2024-09-03") == "2024-09-03"
@@ -204,6 +213,7 @@ def test_aggregation(inputs: dict):
     assert ars["unit"] == "UG/L"
     assert ars["n"] == 3 and ars["n_detected"] == 1 and ars["n_below_dlr"] == 1
     assert ars["max"] == 3.5 and ars["mean_detected"] == 3.5
+    assert ars["p90"] == 3.5 and ars["p90_n"] == 1              # one detection -> that value
     assert ars["latest_date"] == "2025-06-01" and ars["latest_value"] is None   # latest row was below the DLR
     assert ars["sampling_points"] == 3
     assert ars["point_types"] == {"DS": 1, "WL": 2}
@@ -216,11 +226,13 @@ def test_aggregation(inputs: dict):
     assert brm["id"] is None and brm["raw_name"] == "BROMOFORM" and brm["storet"] == "2942"
     assert brm["n"] == 1 and brm["n_detected"] == 0 and brm["max"] is None and brm["mean_detected"] is None
     assert brm["latest_value"] is None
+    assert brm["p90"] is None and brm["p90_n"] == 0            # no detections -> null
 
     ph = one["analytes"]["ph"]
     assert ph["n"] == 2 and ph["n_detected"] == 2
     assert ph["latest_date"] == "2024-02-02" and ph["latest_value"] == 7.9 and ph["max"] == 7.9
     assert ph["mean_detected"] == 7.85
+    assert ph["p90"] == 7.9 and ph["p90_n"] == 2               # rank ceil(0.9 * 2) = 2 -> the larger value
     assert ph["other_storets"] == {"C253": "PH, FIELD"}   # 1925 is the more frequent... tie -> first seen
 
     two = systems["CA4300002"]
