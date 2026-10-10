@@ -1,0 +1,20 @@
+{
+  "pwsid": "CA4300834",
+  "system_name": "CAMP SARATOGA",
+  "status": "not_found",
+  "report": null,
+  "sources_described": null,
+  "search_log": [
+    "WebSearch '\"Camp Saratoga\" Saratoga water system consumer confidence report' -> only Saratoga Springs (Utah), Saratoga (Wyoming/NY) results",
+    "WebSearch '\"Camp Saratoga\" Saratoga California camp water CA4300834' -> only a mytownview.com SDWIS-derived listing (community system, ~450 served); no report",
+    "Drinking Water Watch https://sdwis.waterboards.ca.gov/PDWW/JSP/WaterSystemDetail.jsp?tinwsys_is_number=4288&tinwsys_st_code=CA -> active since 02-28-2023, surface water (Booker Creek intake; Saratoga Creek inactive; Well 01 abandoned), service area type 'summer camp', 24500 Big Basin Way Saratoga, phone 408-709-3005, 'No web address provided'; CCR.jsp pages for 2023-2025 contain no report link",
+    "WebSearch '\"24500 Big Basin Way\" Saratoga' -> no listing for the address",
+    "WebSearch '\"408-709-3005\" OR \"(408) 709-3005\" Saratoga camp' -> no match",
+    "WebSearch '\"Camp Saratoga\" 95070 summer camp ... \"Big Basin Way\"' -> historical: Camp Saratoga was the URJ Jewish youth camp later called Camp Swig",
+    "WebSearch 'former \"Camp Swig\" Saratoga property 24500 Big Basin Way current owner camp' -> jweekly coverage through 2008 only (camp closed 2003, sales fell through); current operator and any website not identified",
+    "Santa Clara County DEH: system is regulated by State DDW District 17 per DWW; no county CCR repository found"
+  ],
+  "analytes": [],
+  "violations": [],
+  "extraction_notes": "No published CCR located online within the effort cap. The operator of the camp at 24500 Big Basin Way (the former Camp Swig site) could not be identified from web sources, so no owner website could be checked."
+}

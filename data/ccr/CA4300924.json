@@ -1,0 +1,42 @@
+{
+  "pwsid": "CA4300924",
+  "system_name": "PARKWAY LAKES RV PARK",
+  "status": "found",
+  "report": {
+    "data_year": 2025,
+    "title": "2025 Consumer Confidence Report - Parkway Lakes RV Park, CA4300924",
+    "url": "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300924&Year=2025&isCert=false",
+    "file": "reports/CA4300924/ccr-2025.pdf",
+    "format": "pdf",
+    "sha256": "adc365b576483bba80a0ec58581ffae043e8159e70ac8bca1883eb634bcab5d9",
+    "pages": 5,
+    "retrieved": "2026-10-10"
+  },
+  "sources_described": "One groundwater well located on the property. Report dated June 30, 2026; operated by MCSI Water Systems Management.",
+  "search_log": [
+    "WebSearch: \"Parkway Lakes RV\" Morgan Hill \"consumer confidence report\" OR \"water quality report\" -> no report (only City of Morgan Hill CCRs, campground listings, geoconnex.us/ref/pws/CA4300924)",
+    "WebSearch: Parkway Lakes RV Park official website water quality report -> no park website with a report",
+    "https://sdwis.waterboards.ca.gov/PDWW/JSP/SearchDispatch (POST number=CA4300924) -> tinwsys_is_number=4302; groundwater, TD",
+    "https://sdwis.waterboards.ca.gov/PDWW/JSP/CCR.jsp?tinwsys_is_number=4302&tinwsys_st_code=CA&Year=2025 -> 'Report' link to the State EAR portal",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300924&Year=2025&isCert=false -> HTTP 200, 5-page PDF = the 2025 CCR used here",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300924&Year=2024&isCert=false -> HTTP 200 PDF (2024, not used); Year=2023 -> HTTP 200 PDF (not used)"
+  ],
+  "analytes": [
+    {"id": "lead", "raw_name": "Lead", "unit_raw": "ppb", "value": 1, "value_basis": "90th_percentile", "average": null, "range_low": 0, "range_high": 4.2, "detected": true, "mcl_printed": "15", "phg_printed": "0.2", "source_group": null, "sample_year": 2025, "page": 3, "notes": "Table 1: sample date 9/2025; 5 samples; 0 sites exceeding AL; range printed 'ND – 4.2'; MCL column is the action level (AL)"},
+    {"id": "copper", "raw_name": "Copper", "unit_raw": "ppm", "value": 0.076, "value_basis": "90th_percentile", "average": null, "range_low": 0.01, "range_high": 0.21, "detected": true, "mcl_printed": "1.3", "phg_printed": "0.3", "source_group": null, "sample_year": 2025, "page": 3, "notes": "Table 1: sample date 9/2025; 5 samples; 0 sites exceeding AL"},
+    {"id": "sodium", "raw_name": "Sodium", "unit_raw": "ppm", "value": 28, "value_basis": "level_detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "None", "phg_printed": "NA", "source_group": null, "sample_year": 2025, "page": 3, "notes": "Table 2; sample date 12/2025; range printed '--'"},
+    {"id": "hardness", "raw_name": "Hardness", "unit_raw": "ppm", "value": 253, "value_basis": "level_detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "None", "phg_printed": "NA", "source_group": null, "sample_year": 2025, "page": 3, "notes": "Table 2; sample date 12/2025; range printed '--'"},
+    {"id": "chromium_6", "raw_name": "Chromium (hexavalent)", "unit_raw": "µg/L", "value": 2.4, "value_basis": "level_detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "10", "phg_printed": "0.2", "source_group": null, "sample_year": 2024, "page": 4, "notes": "Table 3 (primary); sample date 12/2024; range '--'; PHG printed 0.2 (the California PHG is 0.02)"},
+    {"id": "fluoride", "raw_name": "Fluoride", "unit_raw": "mg/L", "value": 0.1, "value_basis": "level_detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "2", "phg_printed": "0.1", "source_group": null, "sample_year": 2025, "page": 4, "notes": "Table 3; sample date 12/2025; range '--'; PHG printed 0.1 (the California PHG is 1)"},
+    {"id": "nitrate_n", "raw_name": "Nitrate", "unit_raw": "mg/L", "value": 1.2, "value_basis": "level_detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "10 (as N)", "phg_printed": "10 (as N)", "source_group": null, "sample_year": 2025, "page": 4, "notes": "Table 3; sample date 12/2025; range '--'"},
+    {"id": "chlorine_residual", "raw_name": "Chlorine", "unit_raw": "mg/L", "value": 1.32, "value_basis": "level_detected", "average": null, "range_low": 1.12, "range_high": 1.75, "detected": true, "mcl_printed": "[4.0 (as Cl2)]", "phg_printed": "[4.0 (as Cl2)]", "source_group": null, "sample_year": 2025, "page": 4, "notes": "Table 3; sample date '2025'; MRDL/MRDLG; footnote: residuals measured in the field with a HACH DR300 pocket colorimeter during coliform monitoring"},
+    {"id": "chloride", "raw_name": "Chloride", "unit_raw": "mg/L", "value": 40, "value_basis": "level_detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "500", "phg_printed": "NA", "source_group": null, "sample_year": 2025, "page": 5, "notes": "Table 4 (secondary); sample date 12/2025; range '--'"},
+    {"id": "color", "raw_name": "Color", "unit_raw": "Units", "value": 7, "value_basis": "level_detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "15", "phg_printed": "NA", "source_group": null, "sample_year": 2025, "page": 5, "notes": "Table 4; sample date 12/2025"},
+    {"id": "sulfate", "raw_name": "Sulfate", "unit_raw": "mg/L", "value": 41, "value_basis": "level_detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "500", "phg_printed": "NA", "source_group": null, "sample_year": 2025, "page": 5, "notes": "Table 4; sample date 12/2025"},
+    {"id": "specific_conductance", "raw_name": "Specific Conductance", "unit_raw": "µS/cm", "value": 592, "value_basis": "level_detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "1,600", "phg_printed": "NA", "source_group": null, "sample_year": 2025, "page": 5, "notes": "Table 4; sample date 12/2025"},
+    {"id": "tds", "raw_name": "Total Dissolved Solids [TDS]", "unit_raw": "mg/L", "value": 318, "value_basis": "level_detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "1,000", "phg_printed": "NA", "source_group": null, "sample_year": 2025, "page": 5, "notes": "Table 4; sample date 12/2025"},
+    {"id": "turbidity", "raw_name": "Turbidity", "unit_raw": "Units", "value": 0.5, "value_basis": "level_detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "5", "phg_printed": "0.1", "source_group": null, "sample_year": 2025, "page": 5, "notes": "Table 4 (secondary standard); sample date 12/2025; unit printed 'Units' (NTU implied); PHG column printed 0.1"}
+  ],
+  "violations": [],
+  "extraction_notes": "Page footers read 'Parkway Lakes RV Park, CA4300927' (typo) while the title and SDWIS give CA4300924. Report has no coliform table and no violation table; it states a lead service line inventory found no lead lines. Sample dates are month/year. Numbers copied as printed."
+}

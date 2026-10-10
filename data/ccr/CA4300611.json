@@ -1,0 +1,41 @@
+{
+  "pwsid": "CA4300611",
+  "system_name": "CASA DE FRUTA WATER SYSTEM",
+  "status": "found",
+  "report": {
+    "data_year": 2025,
+    "title": "2025 Consumer Confidence Report",
+    "url": "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300611&Year=2025&isCert=false",
+    "file": "reports/CA4300611/ccr-2025.docx",
+    "format": "docx",
+    "sha256": "06f0bd949f69061e71597fcca905d9f8db173a6cb33732012815691180885c9b",
+    "pages": null,
+    "retrieved": "2026-10-10"
+  },
+  "sources_described": "Groundwater wells: Supply Well #5 and Supply Well #6 at 10011 Pacheco Pass Hwy, Hollister (report names the system 'Casa De Fruta Parkway WS - 4300611'). Report date 6/1/2026; contact Joe Zanger.",
+  "search_log": [
+    "WebSearch: \"Casa de Fruta\" water system \"consumer confidence report\" OR \"water quality report\" -> no relevant result (hits were the City of Casa, Arkansas, and generic CCR pages)",
+    "WebSearch: casadefruta.com water quality report -> nothing on the business site",
+    "https://sdwis.waterboards.ca.gov/PDWW/JSP/SearchDispatch (POST number=CA4300611) -> tinwsys_is_number=4225; groundwater, T1",
+    "https://sdwis.waterboards.ca.gov/PDWW/JSP/CCR.jsp?tinwsys_is_number=4225&tinwsys_st_code=CA&Year=2025 -> 'Report' link to the State EAR portal",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300611&Year=2025&isCert=false -> HTTP 200, Word .docx (50813 bytes) = the 2025 CCR used here",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300611&Year=2024&isCert=false -> HTTP 200 .docx (2024 CCR, not used); Year=2023 -> HTTP 200 PDF (not used)"
+  ],
+  "analytes": [
+    {"id": "lead", "raw_name": "Lead", "unit_raw": "ppb", "value": null, "value_basis": "90th_percentile", "average": null, "range_low": 0, "range_high": 0, "detected": false, "mcl_printed": "15", "phg_printed": "0.2", "source_group": null, "sample_year": 2024, "page": null, "notes": "Table 2: sample date printed '09/24'; 5 samples; 90th percentile ND; 0 sites exceeding AL; range printed '0 - 0'; MCL column is the action level (AL)"},
+    {"id": "copper", "raw_name": "Copper", "unit_raw": "ppm", "value": 0.147, "value_basis": "90th_percentile", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "1.3", "phg_printed": "0.3", "source_group": null, "sample_year": 2024, "page": null, "notes": "Table 2: sample date printed '09/24'; 5 samples; 0 sites exceeding AL; range printed N/A"},
+    {"id": "sodium", "raw_name": "Sodium", "unit_raw": "ppm", "value": 39, "value_basis": "level_detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "None", "phg_printed": "None", "source_group": null, "sample_year": 2025, "page": null, "notes": "Table 3; sample date printed '05/25'; range N/A"},
+    {"id": "hardness", "raw_name": "Hardness", "unit_raw": "ppm", "value": 250, "value_basis": "level_detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "None", "phg_printed": "None", "source_group": null, "sample_year": 2025, "page": null, "notes": "Table 3; sample date printed '05/25'; range N/A"},
+    {"id": "nitrate_n", "raw_name": "Nitrate", "unit_raw": "ppm", "value": 3.4, "value_basis": "level_detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "10", "phg_printed": "10", "source_group": null, "sample_year": 2025, "page": null, "notes": "Table 4 (primary); sample date printed '8/25'; printed as 'Nitrate (ppm)' with MCL 10, i.e. as nitrogen; range N/A"},
+    {"id": "fluoride", "raw_name": "Fluoride", "unit_raw": "ppm", "value": 0.27, "value_basis": "level_detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "2", "phg_printed": "1", "source_group": null, "sample_year": 2025, "page": null, "notes": "Table 4; sample date printed '08/25'; level printed '.27'; range N/A"},
+    {"id": "barium", "raw_name": "Barium", "unit_raw": "ppm", "value": 75, "value_basis": "level_detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "1", "phg_printed": "0.002", "source_group": null, "sample_year": 2022, "page": null, "notes": "Table 4; sample date printed '08/22'; copied as printed: '75' with unit ppm and MCL 1 ppm. 75 ppm would be 75x the MCL and the report flags no violation, so the unit is almost certainly ppb (0.075 ppm); PHG printed 0.002 (the California PHG is 2 ppm). Treat with caution."},
+    {"id": "radium_combined", "raw_name": "Radium 226/228", "unit_raw": "pCi/L", "value": 0.973, "value_basis": "level_detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "5", "phg_printed": "0.019pCi/L", "source_group": null, "sample_year": 2025, "page": null, "notes": "Table 4; sample date printed '11/25'; range N/A"},
+    {"id": "chromium_6", "raw_name": "Hexavalent Chromium", "unit_raw": "ppb", "value": 0.28, "value_basis": "level_detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "10", "phg_printed": "0.02", "source_group": null, "sample_year": 2024, "page": null, "notes": "Table 4; sample date printed '11/24'; range N/A"},
+    {"id": "sulfate", "raw_name": "Sulfate", "unit_raw": "ppm", "value": 64, "value_basis": "level_detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "500", "phg_printed": "N/A", "source_group": null, "sample_year": 2025, "page": null, "notes": "Table 5 (secondary); sample date printed '05/25'; SMCL 500"},
+    {"id": "chloride", "raw_name": "Chloride", "unit_raw": "ppm", "value": 19, "value_basis": "level_detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "500 mg/L", "phg_printed": "N/A", "source_group": null, "sample_year": 2022, "page": null, "notes": "Table 5; sample date printed '08/22'"},
+    {"id": "specific_conductance", "raw_name": "Specific Conductance", "unit_raw": "Micromhos omhos/cm", "value": 660, "value_basis": "level_detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "1600", "phg_printed": "N/A", "source_group": null, "sample_year": 2025, "page": null, "notes": "Table 5; sample date printed '05/25'; unit printed 'Micromhos omhos/cm' (sic, micromhos/cm)"},
+    {"id": "tds", "raw_name": "Total Dissolved Solids*", "unit_raw": "ppm", "value": 500, "value_basis": "level_detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "1000", "phg_printed": "N/A", "source_group": null, "sample_year": 2025, "page": null, "notes": "Table 5; sample date printed '05/25'; the asterisk in the name has no matching footnote in the document"}
+  ],
+  "violations": [],
+  "extraction_notes": "Filed with the State as a Word .docx, so 'pages' and per-row 'page' are null; text read from word/document.xml with python3 -I. Sample dates are printed month/year only (e.g. '09/24'). The document has no coliform table (Table 1) and no violation table; the RTCR statement says no coliform bacteria were detected in 2025 and no Level 1/2 assessments were triggered. Barium row has an apparent unit error (see its notes)."
+}

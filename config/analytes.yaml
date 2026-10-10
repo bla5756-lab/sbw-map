@@ -43,7 +43,7 @@ analytes:
     threshold: 10
     threshold_type: MCL
     phg: 10
-    aliases: ["Nitrate (as N)", "Nitrate as N", "Nitrate (as nitrogen)", "Nitrate as nitrogen", "Nitrate-N", "Nitrate (N)"]
+    aliases: ["Nitrate (as N)", "Nitrate as N", "Nitrate (as nitrogen)", "Nitrate as nitrogen", "Nitrate-N", "Nitrate (N)", "Nitrate", "Nitrate (as NO3)", "Nitrate as NO3", "Nitrate (NO3)"]
     notes: "Older reports give nitrate as NO3 with MCL 45 ppm; convert (as N = as NO3 / 4.43) and note it."
   - id: nitrite_n
     name: Nitrite (as N)
@@ -539,7 +539,7 @@ analytes:
     threshold_type: NONE
     phg: null
     aliases: ["PFHxA", "Perfluorohexanoic acid"]
-  - id: pfbA
+  - id: pfba
     name: PFBA
     group: pfas
     unit: ppt

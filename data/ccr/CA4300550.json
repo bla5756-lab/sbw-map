@@ -1,0 +1,33 @@
+{
+  "pwsid": "CA4300550",
+  "system_name": "VISTA GRANDE WATER USERS ASSOCIATION",
+  "status": "found",
+  "report": {
+    "data_year": 2025,
+    "title": "2025 Consumer Confidence Report - Vista Grande Water Users Association (VGWUA)",
+    "url": "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300550&Year=2025&isCert=false",
+    "file": "reports/CA4300550/ccr-2025.pdf",
+    "format": "pdf",
+    "sha256": "a58563ba9c4dfb8a44a6d9ffd3fbff2d04df8ec05d7db8e1771de4982e351ecc",
+    "pages": 5,
+    "retrieved": "2026-10-10"
+  },
+  "sources_described": "All water is purchased from San Jose Water (SJW) - Mountain Surface Water; source names/locations and the source water assessment are referred to the attached SJW CCR.",
+  "search_log": [
+    "WebSearch \"Vista Grande Water Users Association\" Los Gatos water quality report -> only third-party aggregator pages (pollutionscan, tapwaterdata); no report",
+    "No system website found (contact is a gmail address in the report)",
+    "Drinking Water Watch https://sdwis.waterboards.ca.gov/PDWW/JSP/WaterSystemDetail.jsp?tinwsys_is_number=4197&tinwsys_st_code=CA -> Consumer Confidence Reports tab lists 2025, 2024, 2023 Report + Certification links on the State Water Board EAR portal",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300550&Year=2025&isCert=false -> 5-page PDF '2025 Consumer Confidence Report', report date 6/19/2026 -> used",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300550&Year=2024&isCert=false -> 15-page PDF '2024 Consumer Confidence Report' (report date 6/19/2025) - older, not used"
+  ],
+  "analytes": [
+    {"id": "e_coli", "raw_name": "E. coli (In the year)", "unit_raw": null, "value": 0, "value_basis": "highest number of detections", "average": null, "range_low": null, "range_high": null, "detected": false, "mcl_printed": "(a)", "phg_printed": "0", "source_group": null, "sample_year": 2025, "page": 4, "notes": "Table 1: Highest No. of Detections 0, No. of Months in Violation 0 (row text is scrambled by the PDF layout; both cells read 0); MCLG column printed as PHG"},
+    {"id": "lead", "raw_name": "Lead", "unit_raw": "ppb", "value": null, "value_basis": "90th percentile", "average": null, "range_low": null, "range_high": null, "detected": false, "mcl_printed": "15", "phg_printed": "0.2", "source_group": null, "sample_year": 2024, "page": 4, "notes": "Table 2: sample date 9/30/24, 5 samples, 90th percentile ND, 0 sites exceeding AL, range of results ND, Violation 'No'; mcl_printed is the AL"},
+    {"id": "copper", "raw_name": "Copper", "unit_raw": "ppm", "value": 0.226, "value_basis": "90th percentile", "average": null, "range_low": 0.033, "range_high": 0.266, "detected": true, "mcl_printed": "1.3", "phg_printed": "0.3", "source_group": null, "sample_year": 2024, "page": 4, "notes": "Table 2: sample date 9/30/24, 5 samples, 0 sites exceeding AL, range 0.033-0.266, Violation 'No'; mcl_printed is the AL"},
+    {"id": "tthm", "raw_name": "TTHMs [Total Trihalomethanes]", "unit_raw": "ppb", "value": 21, "value_basis": "level detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "80", "phg_printed": "NA", "source_group": null, "sample_year": 2025, "page": 4, "notes": "Table 3: sample date 10/17/25; Range of Detections N/A"},
+    {"id": "haa5", "raw_name": "HAA5 [Sum of 5 Haloacetic Acids]", "unit_raw": "ppb", "value": 19, "value_basis": "level detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "60", "phg_printed": "NA", "source_group": null, "sample_year": 2025, "page": 4, "notes": "Table 3: sample date 10/17/25; Range of Detections N/A"},
+    {"id": "chlorine_residual", "raw_name": "Chlorine", "unit_raw": "ppm", "value": 1.4, "value_basis": "level detected", "average": null, "range_low": 0.16, "range_high": 3.04, "detected": true, "mcl_printed": "[4]", "phg_printed": "[4]", "source_group": null, "sample_year": 2025, "page": 4, "notes": "Table 3: sample date printed as 2025; Level Detected 1.4 (not labelled as an average), Range 0.16-3.04; MCL/PHG are the MRDL/MRDLG in brackets"}
+  ],
+  "violations": [],
+  "extraction_notes": "Consecutive system buying all water from San Jose Water. The 'About This Report' paragraph says the monitoring period is January 1 to December 31, 2024, but the document is titled '2025 Consumer Confidence Report', is dated 6/19/2026, and its disinfection-byproduct samples are dated 10/17/25, so data_year is recorded as 2025 (the 2024 slot on DWW holds a separate 2024 report dated 6/19/2025). The SJW CCR is referred to as attached but is not in the 5-page file. Page 5 states the lead service line inventory found all service lines non-lead."
+}

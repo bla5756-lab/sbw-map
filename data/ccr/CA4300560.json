@@ -1,0 +1,39 @@
+{
+  "pwsid": "CA4300560",
+  "system_name": "GREEN MOUNTAIN WATER COMPANY",
+  "status": "found",
+  "report": {
+    "data_year": 2025,
+    "title": "2025 Consumer Confidence Report - Green Mountain Water Company",
+    "url": "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300560&Year=2025&isCert=false",
+    "file": "reports/CA4300560/ccr-2025.pdf",
+    "format": "pdf",
+    "sha256": "1988ee1753cba0072e9beec4696dda29640d6fdcc2be64fc79fe1e96c301702a",
+    "pages": 10,
+    "retrieved": "2026-10-10"
+  },
+  "sources_described": "Water Well: Well 4300560-001, Shady Brook Ln. The report states 'The water source is not considered most vulnerable to low density.'",
+  "search_log": [
+    "WebSearch \"Green Mountain Water Company\" Morgan Hill consumer confidence report -> nothing for this system (greenmountainwater.specialdistrict.org is a Colorado district; City of Morgan Hill reports otherwise)",
+    "No system website found",
+    "Drinking Water Watch https://sdwis.waterboards.ca.gov/PDWW/JSP/WaterSystemDetail.jsp?tinwsys_is_number=4199&tinwsys_st_code=CA -> Consumer Confidence Reports tab lists 2025, 2024, 2023 Report + Certification links on the State Water Board EAR portal",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300560&Year=2025&isCert=false -> 10-page scanned PDF (EPSON Scan, no text layer), '2025 Consumer Confidence Report', report date February 09, 2026 -> used; values read from page images rendered with pdftoppm",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300560&Year=2024&isCert=false -> Word .docx (2024 report) - older, not used"
+  ],
+  "analytes": [
+    {"id": "e_coli", "raw_name": "E. coli", "unit_raw": null, "value": 0, "value_basis": "highest number of detections", "average": null, "range_low": null, "range_high": null, "detected": false, "mcl_printed": "(a)", "phg_printed": "0", "source_group": null, "sample_year": 2025, "page": 4, "notes": "Table 1: Highest No. of Detections printed 'Year 2025 / 0', No. of Months in Violation 0; MCLG column printed as PHG"},
+    {"id": "lead", "raw_name": "Lead", "unit_raw": "ppb", "value": 0.006, "value_basis": "90th percentile", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "15", "phg_printed": "0.2", "source_group": null, "sample_year": 2025, "page": 4, "notes": "Table 2: sample date 06-27-25; 5 samples; 90th percentile printed '.006'; 0 sites exceeding AL; Range of Results printed 0; value copied as printed (.006 ppb is unusually low and may be a units slip); mcl_printed is the AL"},
+    {"id": "copper", "raw_name": "Copper", "unit_raw": "ppm", "value": 0.48, "value_basis": "90th percentile", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "1.3", "phg_printed": "0.3", "source_group": null, "sample_year": 2025, "page": 4, "notes": "Table 2: sample date 06-27-25; 5 samples; 90th percentile printed '.48'; 0 sites exceeding AL; Range of Results blank; mcl_printed is the AL"},
+    {"id": "sodium", "raw_name": "Sodium", "unit_raw": "ppm", "value": 19, "value_basis": "level detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "None", "phg_printed": "None", "source_group": null, "sample_year": 2024, "page": 4, "notes": "Table 3: sample date 12-16-24; Range of Detections column contains only the unit 'ppm'"},
+    {"id": "hardness", "raw_name": "Hardness", "unit_raw": "ppm", "value": 230, "value_basis": "level detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "None", "phg_printed": "None", "source_group": null, "sample_year": null, "page": 4, "notes": "Table 3: sample date printed '12-16-26' (impossible for a report dated Feb 2026; probably 12-16-24) so sample_year left null; Range of Detections column contains only the unit 'ppm'"},
+    {"id": "nitrate_n", "raw_name": "Nitrate", "unit_raw": "ppm", "value": 2.4, "value_basis": "highest single result", "average": null, "range_low": 0.49, "range_high": 2.4, "detected": true, "mcl_printed": "10", "phg_printed": "10", "source_group": null, "sample_year": 2025, "page": 4, "notes": "Table 4 (page 5): four results printed in one row - 03-04-25: 2.4, 04-15-25: 1.9, 07-21-25: .49, 10-14-25: .53; unit 'ppm' printed in the Range of Detections column; range_low/range_high derived from the four printed results; printed as 'Nitrate' with MCL 10 ppm, i.e. as nitrogen"},
+    {"id": "fluoride", "raw_name": "Fluoride", "unit_raw": "ppm", "value": 0.11, "value_basis": "level detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "2", "phg_printed": ".1", "source_group": null, "sample_year": 2024, "page": 5, "notes": "Table 4: sample date 12-16-24; Level Detected printed '.11'; unit 'ppm' printed in the Range column; PHG printed '.1' (California PHG is 1) - copied as printed"},
+    {"id": "turbidity", "raw_name": "Turbidity", "unit_raw": null, "value": 0, "value_basis": "level detected", "average": null, "range_low": null, "range_high": null, "detected": false, "mcl_printed": "5", "phg_printed": null, "source_group": null, "sample_year": 2024, "page": 5, "notes": "Table 4: sample date 12-16-24; Level Detected printed 0; Range of Detections column printed '1' (meaning unclear); no unit printed; MCL 5"},
+    {"id": "iron", "raw_name": "Iron", "unit_raw": "ppm", "value": 0, "value_basis": "level detected", "average": null, "range_low": null, "range_high": null, "detected": false, "mcl_printed": "300", "phg_printed": null, "source_group": null, "sample_year": 2024, "page": 5, "notes": "Table 5 (secondary): sample date 12-16-24; Level Detected printed 0; unit printed in the Range column is 'ppm' although the SMCL 300 is in ppb - copied as printed"},
+    {"id": "e_coli", "raw_name": "E. coli", "unit_raw": null, "value": 0, "value_basis": "total number of detections (groundwater source samples)", "average": null, "range_low": null, "range_high": null, "detected": false, "mcl_printed": "0", "phg_printed": "(0)", "source_group": null, "sample_year": null, "page": 7, "notes": "Table 8 (fecal indicator-positive groundwater source samples): Total No. of Detections 0, Sample Dates blank"},
+    {"id": null, "raw_name": "Enterococci", "unit_raw": null, "value": 0, "value_basis": "total number of detections (groundwater source samples)", "average": null, "range_low": null, "range_high": null, "detected": false, "mcl_printed": "TT", "phg_printed": "N/A", "source_group": null, "sample_year": null, "page": 7, "notes": "Table 8: Total No. of Detections 0, Sample Dates blank"},
+    {"id": null, "raw_name": "Coliphage", "unit_raw": null, "value": 0, "value_basis": "total number of detections (groundwater source samples)", "average": null, "range_low": null, "range_high": null, "detected": false, "mcl_printed": "TT", "phg_printed": "N/A", "source_group": null, "sample_year": null, "page": 7, "notes": "Table 8: Total No. of Detections 0, Sample Dates blank"}
+  ],
+  "violations": [],
+  "extraction_notes": "Scanned (image-only) PDF of the hand-filled state SWS CCR template; numbers were transcribed from page images rendered at 110 dpi, so leading-zero decimals ('.006', '.48', '.49', '.53', '.11', '.1') are as printed. The 'About This Report' paragraph says the monitoring period is Jan 1 - Dec 31, 2024, but the title is '2025 Consumer Confidence Report', the report is dated February 09, 2026, the E. coli row says 'Year 2025' and the lead/copper and nitrate samples are dated 2025, so data_year is recorded as 2025. Units are written in the 'Range of Detections' column instead of ranges. Table 6 (unregulated) is empty; Table 7 and Table 9 are 'None'; Tables 10-11 and the RTCR/variance sections are unfilled template text. Lead-specific language still contains '[NAME OF UTILITY]' placeholders."
+}

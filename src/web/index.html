@@ -32,9 +32,9 @@
       <button class="seg-btn" data-source="lab" role="tab" aria-selected="false" title="Laboratory results submitted to the State Water Board (2023 to present)">State lab results</button>
     </div>
     <div id="stats" class="stats" aria-live="polite">
-      <div class="stat"><span class="dot val"></span><b id="stat-value">0</b><span>with data</span></div>
-      <div class="stat"><span class="dot gray"></span><b id="stat-gray">0</b><span>not in report</span></div>
-      <div class="stat"><span class="dot red"></span><b id="stat-red">0</b><span>no report</span><small id="stat-nr" class="stat-sub"></small></div>
+      <div class="stat"><span class="dot val"></span><b id="stat-value">0</b><span class="lbl">with data</span></div>
+      <div class="stat"><span class="dot gray"></span><b id="stat-gray">0</b><span class="lbl">not in report</span></div>
+      <div class="stat"><span class="dot red"></span><b id="stat-red">0</b><span class="lbl">no report</span><small id="stat-nr" class="stat-sub"></small></div>
     </div>
     <div class="toolbar">
       <input id="search" type="search" placeholder="Filter analytes… (arsenic, pH, PFAS)" autocomplete="off" aria-label="Filter analytes">
@@ -61,6 +61,7 @@
       <span class="switch"></span>
       <span>System labels</span>
     </label>
+    <button id="btn-reports" class="btn-primary wide">Browse all water reports</button>
     <div class="foot-links">
       <button id="btn-theme" class="link">Light basemap</button>
       <span class="sep">·</span>
@@ -100,6 +101,14 @@
   </div>
 </div>
 
+<div id="reports" class="modal hidden" role="dialog" aria-modal="true" aria-label="All water reports">
+  <div class="modal-card wide">
+    <button class="icon-btn modal-close" aria-label="Close">×</button>
+    <h2>Water quality reports</h2>
+    <div id="reports-body"></div>
+  </div>
+</div>
+<div id="notice" class="notice hidden" role="status"></div>
 <div id="tooltip" class="tooltip hidden" role="tooltip"></div>
 <div id="loading" class="loading"><div class="spinner"></div><div>Loading water systems…</div></div>
 

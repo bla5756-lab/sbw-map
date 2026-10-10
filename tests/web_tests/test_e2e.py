@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
-PORT = 8199
+PORT = 8198
 URL = f"http://127.0.0.1:{PORT}/"
 SHOTS = Path(__file__).parent / "screenshots"
 
@@ -77,11 +77,11 @@ def test_sidebar_lists_every_analyte_with_counts(page):
 
 def test_toggle_changes_composite_and_hash(page):
     before = state(page)
-    page.locator("#analytes .row[data-id='nitrate_n'] input").click(force=True)
+    page.locator("#analytes .row[data-id='nitrate_n'] .switch").click()
     after = state(page)
     assert "nitrate_n" in before["enabled"] and "nitrate_n" not in after["enabled"]
     assert "nitrate_n" not in after["hash"]
-    page.locator("#analytes .row[data-id='nitrate_n'] input").click(force=True)
+    page.locator("#analytes .row[data-id='nitrate_n'] .switch").click()
     assert "nitrate_n" in state(page)["enabled"]
 
 
@@ -108,10 +108,10 @@ def test_clear_then_primary_buttons(page):
 
 
 def test_noncommunity_toggle_hides_hatched_systems(page):
-    page.locator("#toggle-noncommunity").click(force=True)
+    page.locator("label:has(#toggle-noncommunity) .switch").click()
     s = state(page)
     assert s["counts"]["notRequired"] == 0 and s["counts"]["value"] + s["counts"]["gray"] + s["counts"]["red"] == 72
-    page.locator("#toggle-noncommunity").click(force=True)
+    page.locator("label:has(#toggle-noncommunity) .switch").click()
     assert state(page)["counts"]["notRequired"] == 48
 
 
@@ -130,7 +130,7 @@ def test_click_found_system_opens_detail_with_report_link(page):
     detail = page.locator("#detail")
     assert detail.is_visible()
     assert target["pwsid"] in detail.inner_text()
-    link = page.locator("#detail a[href$='.pdf'], #detail a[href$='.html']").first
+    link = page.locator("#detail a[href^='/reports/']").first
     href = link.get_attribute("href")
     assert href == "/" + target["file"]
     assert page.request.get(URL.rstrip("/") + href).status == 200

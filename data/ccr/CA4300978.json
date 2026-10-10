@@ -1,0 +1,18 @@
+{
+  "pwsid": "CA4300978",
+  "system_name": "BRUSH AND OLD WELL MUTUAL WATER COMPANY",
+  "status": "not_found",
+  "report": null,
+  "sources_described": null,
+  "search_log": [
+    "WebSearch \"Brush and Old Well Mutual Water Company\" Los Gatos consumer confidence report -> no result for this system",
+    "WebSearch \"Brush and Old Well\" OR \"Brush & Old Well\" mutual water Los Gatos -> only a ProPublica Nonprofit Explorer listing (EIN 77-0280799); no website, no report",
+    "WebSearch Santa Clara County Department of Environmental Health small water systems consumer confidence reports -> no county page listing small-system CCRs found (scceh.org hosts only the state's 2020 small-system CCR instructions)",
+    "Drinking Water Watch search https://sdwis.waterboards.ca.gov/PDWW/JSP/SearchDispatch?number=CA4300978 -> system found (tinwsys_is_number=4327); detail page https://sdwis.waterboards.ca.gov/PDWW/JSP/WaterSystemDetail.jsp?tinwsys_is_number=4327&tinwsys_st_code=CA",
+    "DWW Consumer Confidence Reports tab (CCR.jsp Year=2025/2024/2023) -> 'Report Not Available / Certification Not Available' for 2025, 2024, 2023 (Report links exist only for 2022, 2021, 2020 - older than the 2023 cutoff)",
+    "State EAR portal https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300978&Year=2025|2024|2023&isCert=false -> HTTP 404 for all three years"
+  ],
+  "analytes": [],
+  "violations": [],
+  "extraction_notes": "No CCR for 2023-2025 published anywhere found. Drinking Water Watch holds older reports (2020-2022) for this system, which are outside the fallback window and were not used."
+}

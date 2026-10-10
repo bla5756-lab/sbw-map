@@ -1,0 +1,17 @@
+{
+  "pwsid": "CA4300771",
+  "system_name": "NEW AVENUE MUTUAL WATER COMPANY",
+  "status": "not_found",
+  "report": null,
+  "sources_described": null,
+  "search_log": [
+    "WebSearch '\"New Avenue Mutual Water Company\" Gilroy water quality report' -> City of Gilroy 2025 CCR (different system CA4310004) and tapwaterdata aggregator (which states no CCR has been published/validated there)",
+    "WebSearch '\"New Avenue\" mutual water Gilroy CA4300771 consumer confidence report 2025 OR 2024' -> aggregator pages only",
+    "Domain probe https://newavenuemwc.org/ -> no such host",
+    "Drinking Water Watch https://sdwis.waterboards.ca.gov/PDWW/JSP/WaterSystemDetail.jsp?tinwsys_is_number=4261&tinwsys_st_code=CA -> active, groundwater (Duke/Bannister, East Duke, New/Alessi wells), 305 served, 10900 New Avenue Gilroy, 'No web address provided'; CCR.jsp pages for 2023-2025 contain no report link",
+    "Santa Clara County DEH: system is regulated by State DDW District 17 per DWW; no county CCR repository found"
+  ],
+  "analytes": [],
+  "violations": [],
+  "extraction_notes": "No published CCR located online within the effort cap; the mutual has no website."
+}

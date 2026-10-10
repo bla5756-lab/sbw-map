@@ -1,0 +1,20 @@
+{
+  "pwsid": "CA4300770",
+  "system_name": "THREE SPRINGS RANCH MUTUAL WATER COMPANY",
+  "status": "not_found",
+  "report": null,
+  "sources_described": null,
+  "search_log": [
+    "WebSearch \"Three Springs Ranch Mutual Water Company\" Mt. Hamilton consumer confidence report water quality -> no result for this system; hits were Lick Observatory's reports at mthamilton.ucolick.org/techdocs/practical_info/CCR20xx.pdf",
+    "https://mthamilton.ucolick.org/techdocs/practical_info/CCR2025.pdf -> downloaded and checked: it is the 'Mt. Hamilton Community Water System CA4300909' report, a different system - not applicable",
+    "WebSearch \"Three Springs Ranch\" water Mt. Hamilton California CA4300770 -> only real-estate and historical pages; no website for the company",
+    "WebSearch \"Three Springs Ranch Mutual Water\" OR \"Three Springs Ranch MWC\" -> only a GuideStar nonprofit profile (EIN 94-2620964, Mt Hamilton); no report",
+    "WebSearch Santa Clara County Department of Environmental Health small water systems consumer confidence reports -> no county page listing small-system CCRs found (scceh.org hosts only the state's 2020 small-system CCR instructions)",
+    "Drinking Water Watch search https://sdwis.waterboards.ca.gov/PDWW/JSP/SearchDispatch?number=CA4300770 -> system found (tinwsys_is_number=4260); detail page https://sdwis.waterboards.ca.gov/PDWW/JSP/WaterSystemDetail.jsp?tinwsys_is_number=4260&tinwsys_st_code=CA",
+    "DWW Consumer Confidence Reports tab (CCR.jsp Year=2025/2024/2023) -> 'Report Not Available / Certification Not Available' for 2025, 2024, 2023 (also 2022 and 2020; 2021 shows a Report link only, older than the 2023 cutoff)",
+    "State EAR portal https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300770&Year=2025|2024|2023&isCert=false -> HTTP 404 for all three years"
+  ],
+  "analytes": [],
+  "violations": [],
+  "extraction_notes": "No CCR for 2023-2025 published anywhere found. The only state-held report is a 2021 CCR link on Drinking Water Watch, which is older than the fallback window and was not used."
+}

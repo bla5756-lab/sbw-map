@@ -1,0 +1,19 @@
+{
+  "pwsid": "CA4300994",
+  "system_name": "COYOTE VALLEY RV RESORT",
+  "status": "not_found",
+  "report": null,
+  "sources_described": null,
+  "search_log": [
+    "WebSearch '\"Coyote Valley RV Resort\" Morgan Hill water quality report consumer confidence' -> only City of Morgan Hill CCRs and third-party aggregators; no resort report",
+    "WebSearch 'Coyote Valley RV Resort Morgan Hill official website' -> directory listings (9750 Monterey Rd); official site resolved via domain probe",
+    "https://coyotevalleyrvresort.com/ -> redirects to https://coyotevalleyresort.com/ (WordPress site); homepage has no water-quality link",
+    "https://coyotevalleyresort.com/?s=water+quality -> 'No results found'; wp-sitemap page list empty",
+    "Drinking Water Watch https://sdwis.waterboards.ca.gov/PDWW/JSP/WaterSystemDetail.jsp?tinwsys_is_number=4343&tinwsys_st_code=CA -> active community system (mobile home park), Well 01, 500 served, 'No web address provided'; CCR.jsp pages for 2023-2025 contain no report link",
+    "Santa Clara County DEH: system is regulated by State DDW District 17 per DWW; no county CCR repository found",
+    "RV parks must post the CCR at the park entrance/office (HSC 116470); it is likely only available on site"
+  ],
+  "analytes": [],
+  "violations": [],
+  "extraction_notes": "No published CCR located online within the effort cap."
+}

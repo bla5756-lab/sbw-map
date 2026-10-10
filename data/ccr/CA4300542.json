@@ -1,0 +1,19 @@
+{
+  "pwsid": "CA4300542",
+  "system_name": "SAN MARTIN COUNTY WATER DISTRICT",
+  "status": "not_found",
+  "report": null,
+  "sources_described": null,
+  "search_log": [
+    "WebSearch '\"San Martin County Water District\" consumer confidence report water quality' -> only CPUC-hosted CCRs for the separate West San Martin Water Works (2013, 2020, 2022); nothing for this district",
+    "WebSearch '\"San Martin County Water District\" CA4300542' -> Santa Clara LAFCO profile (https://santaclaralafco.org/node/85) says the district (formed 1988, groundwater, ~0.71 sq mi east of Monterey Road) has no website",
+    "WebSearch '\"San Martin County Water District\" 2025 OR 2024 \"water quality report\" OR \"consumer confidence report\" pdf' -> nothing",
+    "Domain probe https://sanmartincwd.org/ -> no such host",
+    "Drinking Water Watch https://sdwis.waterboards.ca.gov/PDWW/JSP/WaterSystemDetail.jsp?tinwsys_is_number=4192&tinwsys_st_code=CA -> active, 627 served, 'No web address provided', P.O. Box 120 San Martin, 408-683-4101; CCR.jsp pages for 2023-2025 contain no report link (DWW does not host CCRs)",
+    "Santa Clara County DEH: per DWW the system is regulated by State DDW District 17 (Richmond), not the county; no county CCR repository found (the county DEH page only lists programs)",
+    "Not to be confused with CA4300543 Cal Am - West San Martin, whose report was found separately"
+  ],
+  "analytes": [],
+  "violations": [],
+  "extraction_notes": "No published CCR located online within the effort cap; the district has no website and no report is linked from state or county pages."
+}

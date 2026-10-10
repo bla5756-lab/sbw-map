@@ -1,0 +1,20 @@
+{
+  "pwsid": "CA4300832",
+  "system_name": "SOUTH COUNTY RETIREMENT HOME",
+  "status": "not_found",
+  "report": null,
+  "sources_described": null,
+  "search_log": [
+    "WebSearch \"South County Retirement Home\" San Martin water system -> only a tapwaterdata aggregator listing (no report, no results on file) and LAFCO/CPUC documents about other San Martin water systems",
+    "WebSearch \"South County Retirement Home\" OR \"South County Retirement\" San Martin \"consumer confidence report\" OR CA4300832 -> nothing about this system",
+    "No system website exists (Drinking Water Watch: no web address provided; 460 Church Avenue, San Martin, 408-683-0229; one well, institutional service area)",
+    "Santa Clara County Dept. of Environmental Health: not the primacy agency for this system (regulated by SWRCB DDW District 17 per Drinking Water Watch); no county small-water-system CCR page found",
+    "Drinking Water Watch https://sdwis.waterboards.ca.gov/PDWW/JSP/WaterSystemDetail.jsp?tinwsys_is_number=4286&tinwsys_st_code=CA -> Consumer Confidence Reports menu: 2025, 2024, 2023, 2022, 2021 and 2020 all 'Report Not Available / Certification Not Available'",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300832&Year=2025&isCert=false -> HTTP 404",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300832&Year=2024&isCert=false -> HTTP 404",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300832&Year=2023&isCert=false -> HTTP 404"
+  ],
+  "analytes": [],
+  "violations": [],
+  "extraction_notes": "No Consumer Confidence Report for this system is published anywhere found online; the State Water Board has no CCR on file for 2020-2025."
+}

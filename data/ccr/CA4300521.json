@@ -1,0 +1,20 @@
+{
+  "pwsid": "CA4300521",
+  "system_name": "KENNON WATER COMPANY",
+  "status": "not_found",
+  "report": null,
+  "sources_described": null,
+  "search_log": [
+    "WebSearch: \"Kennon Water Company\" Los Gatos \"consumer confidence report\" OR \"water quality report\" -> only aggregator pages (tapwaterdata.com: PWSID CA4300521, 142 served, 'surface water purchased', 'a current CCR has not been published or validated'); no report",
+    "https://www.tapwaterdata.com/utilities/ca/kennon-water-company -> no CCR link; contact PO Box 557, San Jose CA 95106, 408-513-3273",
+    "https://sdwis.waterboards.ca.gov/PDWW/JSP/SearchDispatch (POST number=CA4300521) -> system found: tinwsys_is_number=4188, 17235 Deer Park Road, Los Gatos CA 95032; purchased surface water (SWP); 'No web address provided'",
+    "https://sdwis.waterboards.ca.gov/PDWW/JSP/CCR.jsp?tinwsys_is_number=4188&tinwsys_st_code=CA&Year=2025 -> 'Report Not Available' / 'Certification Not Available'",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300521&Year=2025&isCert=false -> HTTP 404; Year=2024 -> 404; Year=2023 -> 404",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300521&Year=2022&isCert=false, Year=2021, Year=2020 -> HTTP 200 (Word .docx uploads exist for data years 2020-2022 only, older than the 2023 cutoff; not downloaded)",
+    "Santa Clara County DEH small-water-systems pages: https://deh.santaclaracounty.gov/ -> HTTP 403; deh.sccgov.org / cep.santaclaracounty.gov -> no response; searches for the county program returned only other counties",
+    "No system website exists as far as web search and Drinking Water Watch show"
+  ],
+  "analytes": [],
+  "violations": [],
+  "extraction_notes": "Nothing published for 2025, 2024 or 2023. The State EAR portal holds .docx uploads for data years 2022, 2021 and 2020 (ViewCCR?PwsID=CA4300521&Year=2022 etc.) if an older report is ever acceptable."
+}

@@ -76,7 +76,8 @@ def create_app(cfg: dict | None = None) -> FastAPI:
         path = (reports_dir / pwsid / filename).resolve()
         if reports_dir not in path.parents or not path.is_file():
             raise HTTPException(404, "report not found")
-        media = "application/pdf" if path.suffix.lower() == ".pdf" else "text/html" if path.suffix.lower() in (".html", ".htm") else "application/octet-stream"
+        media = {".pdf": "application/pdf", ".html": "text/html", ".htm": "text/html",
+                 ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"}.get(path.suffix.lower(), "application/octet-stream")
         return FileResponse(path, media_type=media, headers={"Content-Disposition": f'inline; filename="{filename}"'})
 
     @app.get("/")

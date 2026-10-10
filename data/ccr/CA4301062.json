@@ -1,0 +1,19 @@
+{
+  "pwsid": "CA4301062",
+  "system_name": "LEE'S ORCHARD OWNERS ASSOCIATION",
+  "status": "not_found",
+  "report": null,
+  "sources_described": null,
+  "search_log": [
+    "WebSearch '\"Lee's Orchard\" Milpitas owners association water consumer confidence report' -> no hit (City of Milpitas CCR pages only)",
+    "WebSearch '\"Lee's Orchard\" Milpitas water system CA4301062 OR \"Lees Orchard Owners Association\"' -> no hit (real-estate listings for the 13-home Lees Orchard community on Greenrock Rd; City of Milpitas water pages)",
+    "Drinking Water Watch https://sdwis.waterboards.ca.gov/PDWW/JSP/SearchDispatch?number=CA4301062 -> tinwsys_is_number=15578; detail page: primary source SWP (purchased surface water), no treatment plants, physical location Greenrock Rd Milpitas, admin contact 20640 3rd Street Suite 300 Saratoga 408-370-8751 (HOA management), 'No web address provided'; facilities page lists 'MILPITAS TURNOUT' (buys from the City of Milpitas)",
+    "Drinking Water Watch CCR.jsp?tinwsys_is_number=15578&Year=2025 / 2024 / 2023 -> 'Report Not Available', 'Certification Not Available' for all three years",
+    "Direct probe https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4301062&Year=2025|2024|2023|2022&isCert=false -> HTTP 404 for every year",
+    "Santa Clara County Department of Environmental Health small-water-systems pages: search found only the state's 2020 small-system CCR instruction PDF hosted on scceh.org; https://www.scceh.org/Programs/WaterResources/DrinkingWater -> HTTP 404. Drinking Water Watch shows this system is regulated by the State Water Board Division of Drinking Water District 17 (Santa Clara, Richmond office, dwpdist17@waterboards.ca.gov), not by the county, so no county CCR page applies",
+    "State Water Board CCR page https://www.waterboards.ca.gov/drinking_water/certlic/drinkingwater/CCR.html -> points only to Drinking Water Watch / the DDW district office for viewing uploaded CCRs; no other public repository"
+  ],
+  "analytes": [],
+  "violations": [],
+  "extraction_notes": "Consecutive system (13-home HOA) that purchases treated surface water from the City of Milpitas (Milpitas turnout). No CCR of its own has been uploaded to the state portal for 2023-2025 and the association has no website; the City of Milpitas CCR (CA4310009) would describe the water delivered."
+}

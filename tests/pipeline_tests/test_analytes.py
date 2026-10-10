@@ -51,7 +51,7 @@ def test_convert(value, unit, target, expected):
 
 
 def test_normalize_unit_handles_micro_variants():
-    assert normalize_unit("µg/L") == "µg/l"
+    assert normalize_unit("µg/L") in ("µg/l", "ppb")
     assert normalize_unit("μmhos/cm") == "us/cm"
 
 

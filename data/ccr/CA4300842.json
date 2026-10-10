@@ -1,0 +1,19 @@
+{
+  "pwsid": "CA4300842",
+  "system_name": "DEER HILL MUTUAL WATER CO",
+  "status": "not_found",
+  "report": null,
+  "sources_described": null,
+  "search_log": [
+    "WebSearch '\"Deer Hill Mutual Water\" Santa Clara County water quality report' -> no hit for this system (only a mytownview.com listing: community system, active, 0 violations)",
+    "WebSearch '\"Deer Hill\" mutual water company Santa Clara County CA4300842 OR \"Deer Hill Mutual Water Co\"' -> no hit (Santa Clara LAFCO mutual water company list page, unrelated mutuals)",
+    "Drinking Water Watch https://sdwis.waterboards.ca.gov/PDWW/JSP/SearchDispatch?number=CA4300842 -> tinwsys_is_number=13976; detail page: primary source GWP (purchased groundwater), no treatment plants, population 36, admin contact P.O. Box 568 Morgan Hill 408-779-5958, 'No web address provided'; facilities page lists 'MORGAN HILL - DEER HILL TURNOUT' (buys from the City of Morgan Hill)",
+    "Drinking Water Watch CCR.jsp?tinwsys_is_number=13976&Year=2025 / 2024 / 2023 -> 'Report Not Available', 'Certification Not Available' for all three years",
+    "Direct probe https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300842&Year=2025|2024|2023|2022&isCert=false -> HTTP 404 for every year",
+    "Santa Clara County Department of Environmental Health small-water-systems pages: search found only the state's 2020 small-system CCR instruction PDF hosted on scceh.org; https://www.scceh.org/Programs/WaterResources/DrinkingWater -> HTTP 404. Drinking Water Watch shows this system is regulated by the State Water Board Division of Drinking Water District 17 (Santa Clara, Richmond office, dwpdist17@waterboards.ca.gov), not by the county, so no county CCR page applies",
+    "State Water Board CCR page https://www.waterboards.ca.gov/drinking_water/certlic/drinkingwater/CCR.html -> points only to Drinking Water Watch / the DDW district office for viewing uploaded CCRs; no other public repository"
+  ],
+  "analytes": [],
+  "violations": [],
+  "extraction_notes": "Consecutive system that purchases groundwater from the City of Morgan Hill (Deer Hill turnout). No CCR of its own has been uploaded to the state portal for 2023-2025 and the company has no website; the City of Morgan Hill's CCR (CA4310008) would describe the water delivered."
+}

@@ -1,0 +1,20 @@
+{
+  "pwsid": "CA4300573",
+  "system_name": "GREEN ACRES MUTUAL WATER",
+  "status": "not_found",
+  "report": null,
+  "sources_described": null,
+  "search_log": [
+    "WebSearch \"Green Acres Mutual Water\" OR \"Sullivan Mutual Water\" Morgan Hill water quality report -> only aggregator listings (mytownview.com: 4 EPA violations, latest 2024-10-17) and the City of Morgan Hill CCR (different system); no report for Green Acres",
+    "WebSearch \"Green Acres Mutual Water\" Morgan Hill -> a 2011 CEQA notice for the Well 5a replacement project and the same aggregator; no CCR or water quality report",
+    "No system website exists (Drinking Water Watch: no web address provided; administrative contact 2110 Green Acres Lane, Morgan Hill, 408-779-2815; sources Well 06 and Well 08)",
+    "Santa Clara County Dept. of Environmental Health: not the primacy agency for this system (regulated by SWRCB DDW District 17 per Drinking Water Watch); no county small-water-system CCR page found",
+    "Drinking Water Watch https://sdwis.waterboards.ca.gov/PDWW/JSP/WaterSystemDetail.jsp?tinwsys_is_number=4204&tinwsys_st_code=CA -> Consumer Confidence Reports menu: 2025, 2024, 2023, 2022, 2021 and 2020 all 'Report Not Available / Certification Not Available'",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300573&Year=2025&isCert=false -> HTTP 404",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300573&Year=2024&isCert=false -> HTTP 404",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300573&Year=2023&isCert=false -> HTTP 404"
+  ],
+  "analytes": [],
+  "violations": [],
+  "extraction_notes": "No Consumer Confidence Report for this system is published anywhere found online; the State Water Board has no CCR on file for 2020-2025."
+}

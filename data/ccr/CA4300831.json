@@ -1,0 +1,18 @@
+{
+  "pwsid": "CA4300831",
+  "system_name": "MT. EDEN MUTUAL WATER COMPANY",
+  "status": "not_found",
+  "report": null,
+  "sources_described": null,
+  "search_log": [
+    "WebSearch: \"Mt. Eden Mutual Water\" OR \"Mount Eden Mutual Water\" Saratoga \"consumer confidence report\" OR \"water quality report\" -> no relevant result (only a causeiq.com nonprofit listing for Mt Eden Mutual Water Co, EIN 77-0254133; no website)",
+    "https://sdwis.waterboards.ca.gov/PDWW/JSP/SearchDispatch (POST number=CA4300831) -> system found: tinwsys_is_number=4285, 22647 Garrod Road, Saratoga CA 95070; purchased surface water (SWP); 'No web address provided'",
+    "https://sdwis.waterboards.ca.gov/PDWW/JSP/CCR.jsp?tinwsys_is_number=4285&tinwsys_st_code=CA&Year=2025 -> table shows 'Report Not Available' and 'Certification Not Available' (same for every year 2020-2025 listed in the CCR menu)",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300831&Year=2025&isCert=false -> HTTP 404 (no uploaded CCR); Year=2024, 2023, 2022, 2021, 2020 -> HTTP 404",
+    "Santa Clara County DEH small-water-systems pages: https://deh.santaclaracounty.gov/ -> HTTP 403 for curl and WebFetch; deh.sccgov.org and cep.santaclaracounty.gov -> no response; web searches for the county program returned only other counties (scceh.org is Santa Cruz County)",
+    "No system website exists as far as web search and Drinking Water Watch show"
+  ],
+  "analytes": [],
+  "violations": [],
+  "extraction_notes": "No Consumer Confidence Report for 2025, 2024 or 2023 is published anywhere found online; the State Water Board EAR portal has no upload for this system for any year 2020-2025."
+}

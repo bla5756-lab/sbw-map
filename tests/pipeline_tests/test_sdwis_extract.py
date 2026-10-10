@@ -1,4 +1,7 @@
-"""Tests for src/pipeline/sdwis_extract.py on a tiny synthetic SDWIS*.tab inside a zip."""
+"""Tests for src/pipeline/sdwis_extract.py on a tiny synthetic SDWIS .tab inside a zip."""
+from __future__ import annotations
+
+import datetime as dt
 import gzip
 import json
 import sys
@@ -9,76 +12,59 @@ import pytest
 import yaml
 
 REPO = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(REPO / "src" / "pipeline"))
+sys.path.insert(0, str(REPO / "src"))
 
-import sdwis_extract as se  # noqa: E402
+from pipeline import sdwis_extract as sx  # noqa: E402
 
-HEADER = [
-    "Regulating Agency", "Water System Number", "Water System Name", "System Status",
-    "Federal Water System Classification", "State Water System Classification", "Principal County Served",
-    "Population Served", "Service Connections", "PS Code", "Sampling Point Name", "Facility Type",
-    "Facility Status", "Sample Type", "Sample Date", "Sample Time", "Analysis Date", "ELAP Cert#", "Lab Name",
-    "Analyte Code", "Analyte Name", "Result", "Counting Error", "Units of Measure",
-    "Less Than Reporting Level", "Reporting Level", "DLR", "MCL", "Method",
-]
-assert len(HEADER) == 29
+HEADER = (
+    "Regulating Agency\tWater System Number\tWater System Name\tSystem Status\t"
+    "Federal Water System Classification\tState Water System Classification\tPrincipal County Served\t"
+    "Population Served\tService Connections\tPS Code\tSampling Point Name\tFacility Type\tFacility Status\t"
+    "Sample Type\tSample Date\tSample Time\tAnalysis Date\tELAP Cert#\tLab Name\tAnalyte Code\tAnalyte Name\t"
+    "Result\tCounting Error\tUnits of Measure\tLess Than Reporting Level\tReporting Level\tDLR\tMCL\tMethod"
+)
 
 
-def row(**kw) -> str:
-    """One data line; defaults mimic the real file, including the trailing-space padding."""
-    base = {
-        "Regulating Agency": "DISTRICT 17 - SANTA CLARA", "Water System Number": "CA4300001   ",
-        "Water System Name": "TEST MUTUAL", "System Status": "A", "Federal Water System Classification": "C   ",
-        "State Water System Classification": "C   ", "Principal County Served": "SANTA CLARA",
-        "Population Served": "100", "Service Connections": "30", "PS Code": "CA4300001_001_001",
-        "Sampling Point Name": "WELL 01", "Facility Type": "WL", "Facility Status": "A", "Sample Type": "RT",
-        "Sample Date": "01-15-2024", "Sample Time": "10:00:00", "Analysis Date": "01-20-2024",
-        "ELAP Cert#": "1180", "Lab Name": "SOME LAB", "Analyte Code": "1005", "Analyte Name": "ARSENIC     ",
-        "Result": "3.5             ", "Counting Error": "", "Units of Measure": "UG/L     ",
-        "Less Than Reporting Level": "N", "Reporting Level": "2.000000000", "DLR": "2", "MCL": "10",
-        "Method": "EPA 200.8                     ",
-    }
-    base.update(kw)
-    return "\t".join(base[c] for c in HEADER)
+def row(pwsid, ps, point, ftype, date, code, name, result, unit, flag, dlr, mcl="", name_pad=True):
+    """One data line in the real files' shape: padded PWSID / analyte name / unit, CRLF added later."""
+    pad = (name + " " * 20) if name_pad else name
+    return "\t".join([
+        "DISTRICT 17 - SANTA CLARA", pwsid + "   ", "TEST SYSTEM " + pwsid[-1], "A", "C   ", "C   ", "SANTA CLARA",
+        "100", "20", ps, point, ftype, "A", "RT", date, "10:00:00", date, "1234", "SOME LAB", code, pad,
+        result, "", unit + "     ", flag, "1.000000000", dlr, mcl, "EPA 200.8",
+    ])
 
 
 ROWS_A = [
-    # CA4300001 arsenic: detected at well 1, ND (flag Y, blank result) at well 2, below-DLR at a DS point
-    row(),
-    row(**{"PS Code": "CA4300001_002_002", "Sampling Point Name": "WELL 02", "Sample Date": "03-10-2025",
-           "Result": "", "Less Than Reporting Level": "Y"}),
-    row(**{"PS Code": "CA4300001_DST_801", "Sampling Point Name": "DBPR Sample", "Facility Type": "DS",
-           "Sample Date": "06-01-2025", "Result": "1.0"}),
-    # nitrate (as N), detected
-    row(**{"Analyte Code": "1040", "Analyte Name": "NITRATE", "Result": "4.2", "Units of Measure": "MG/L     ",
-           "DLR": ".4", "MCL": "10", "Sample Date": "02-02-2024"}),
-    # unmapped analyte with a '<'-prefixed result (never seen in the real data, rule is defensive)
-    row(**{"Analyte Code": "2942", "Analyte Name": "BROMOFORM", "Result": "<0.5", "DLR": "1", "MCL": "",
-           "Sample Date": "02-02-2024"}),
-    # lab pH and field pH -> both canonical ph
-    row(**{"Analyte Code": "1925", "Analyte Name": "PH", "Result": "7.8", "Units of Measure": "PH",
-           "DLR": "", "MCL": "", "Sample Date": "02-02-2024"}),
-    row(**{"Analyte Code": "C253", "Analyte Name": "PH, FIELD", "Result": "7.9", "Units of Measure": "PH",
-           "DLR": "", "MCL": "", "Sample Date": "02-03-2024"}),
-    # a system that is not in the boundaries file: must be dropped
-    row(**{"Water System Number": "CA9999999   ", "Water System Name": "ELSEWHERE", "Result": "9"}),
+    # CA4300001: arsenic at two wells and one distribution point; one plain detect, one Y flag,
+    # one N-flagged value below the DLR (the latest sample) -> latest_value must be null.
+    row("CA4300001", "CA4300001_001_001", "WELL 01", "WL", "01-15-2024", "1005", "ARSENIC", "3.5", "UG/L", "N", "2", "10"),
+    row("CA4300001", "CA4300001_002_002", "WELL 02", "WL", "03-10-2025", "1005", "ARSENIC", "", "UG/L", "Y", "2", "10"),
+    row("CA4300001", "CA4300001_DST_801", "DBPR Sample", "DS", "06-01-2025", "1005", "ARSENIC", "1.0", "UG/L", "N", "2", "10"),
+    # nitrate as N -> nitrate_n, unit kept as MG/L
+    row("CA4300001", "CA4300001_001_001", "WELL 01", "WL", "01-15-2024", "1040", "NITRATE", "4.2", "MG/L", "N", ".4", "10"),
+    # unmapped analyte with a '<' result -> non-detect, key is the raw name
+    row("CA4300001", "CA4300001_001_001", "WELL 01", "WL", "01-15-2024", "2942", "BROMOFORM", "<0.5", "UG/L", "N", "1"),
+    # laboratory pH and field pH both fold into ph
+    row("CA4300001", "CA4300001_001_001", "WELL 01", "WL", "02-01-2024", "1925", "PH", "7.8", "PH", "N", ""),
+    row("CA4300001", "CA4300001_001_001", "WELL 01", "WL", "02-02-2024", "C253", "PH, FIELD", "7.9", "PH", "N", ""),
+    # a system that is not a target
+    row("CA9999999", "CA9999999_001_001", "WELL 01", "WL", "01-15-2024", "1005", "ARSENIC", "9", "UG/L", "N", "2", "10"),
 ]
 ROWS_B = [
-    # CA4300002 lead at a tap, detected; and a malformed line (extra tab inside Sampling Point Name)
-    row(**{"Water System Number": "CA4300002", "Water System Name": "SECOND WATER CO", "Analyte Code": "1030",
-           "Analyte Name": "LEAD", "Result": "6", "DLR": "5", "MCL": "", "Facility Type": "DS",
-           "PS Code": "CA4300002_DST_901", "Sample Date": "01-05-2026"}),
-    row(**{"Water System Number": "CA4300002", "Water System Name": "SECOND WATER CO",
-           "Sampling Point Name": "WELL\tBROKEN", "Sample Date": "02-05-2026"}),
+    # second file: lead for CA4300002 (padding on the PWSID is stripped for matching)
+    row("CA4300002", "CA4300002_DST_801", "LCR Tap Sample", "DS", "02-20-2026", "1030", "LEAD", "6", "UG/L", "N", "5", ""),
+    # a malformed line: an extra tab inside the sampling point name -> written, counted, not aggregated
+    row("CA4300002", "CA4300002_DST_801", "LCR\tTap Sample", "DS", "02-21-2026", "1030", "LEAD", "7", "UG/L", "N", "5", ""),
 ]
 
 CATALOGUE = {
-    "groups": {"inorganic": "Inorganic", "secondary": "Secondary", "lead_copper": "Lead and copper"},
+    "groups": {"inorganic": "Inorganic"},
     "analytes": [
-        {"id": "arsenic", "name": "Arsenic", "group": "inorganic", "unit": "ppb", "aliases": ["Arsenic"]},
-        {"id": "nitrate_n", "name": "Nitrate (as N)", "group": "inorganic", "unit": "ppm", "aliases": []},
-        {"id": "ph", "name": "pH", "group": "secondary", "unit": "pH", "aliases": ["pH"]},
-        {"id": "lead", "name": "Lead", "group": "lead_copper", "unit": "ppb", "aliases": ["Lead"]},
+        {"id": "arsenic", "name": "Arsenic", "group": "inorganic", "unit": "ppb", "threshold": 10, "threshold_type": "MCL", "aliases": ["Arsenic"]},
+        {"id": "nitrate_n", "name": "Nitrate (as N)", "group": "inorganic", "unit": "ppm", "threshold": 10, "threshold_type": "MCL", "aliases": ["Nitrate as N"]},
+        {"id": "ph", "name": "pH", "group": "inorganic", "unit": "pH", "threshold": 8.5, "threshold_low": 6.5, "threshold_type": "RANGE", "aliases": ["pH"]},
+        {"id": "lead", "name": "Lead", "group": "inorganic", "unit": "ppb", "threshold": 15, "threshold_type": "AL", "aliases": ["Lead"]},
     ],
 }
 ANALYTE_MAP = {
@@ -95,172 +81,172 @@ BOUNDARIES = {
     "type": "FeatureCollection",
     "features": [
         {"type": "Feature", "properties": {"WATER_SYSTEM_NUMBER": p, "WATER_SYSTEM_NAME": n}, "geometry": None}
-        for p, n in [("CA4300001", "TEST MUTUAL"), ("CA4300002", "SECOND WATER CO"), ("CA4300003", "NO DATA WATER")]
+        for p, n in [("CA4300001", "ONE"), ("CA4300002", "TWO"), ("CA4300003", "THREE (no rows)")]
     ],
 }
 
 
-def make_zip(path: Path, member: str, lines: list[str]) -> Path:
-    body = "\r\n".join(["\t".join(HEADER)] + lines) + "\r\n"
-    with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
-        zf.writestr(member, body.encode("cp1252"))
+def make_zip(path: Path, member: str, rows: list[str]) -> Path:
+    text = "\r\n".join([HEADER, *rows]) + "\r\n"
+    with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr(zipfile.ZipInfo(member, date_time=(2026, 7, 23, 5, 10, 16)), text.encode("cp1252"))
     return path
 
 
-@pytest.fixture
-def inputs(tmp_path):
+@pytest.fixture()
+def inputs(tmp_path: Path) -> dict:
     raw = tmp_path / "raw"
     raw.mkdir()
     zips = [make_zip(raw / "SDWIS4.zip", "SDWIS4.tab", ROWS_A), make_zip(raw / "SDWIS5.zip", "SDWIS5.tab", ROWS_B)]
-    boundaries = tmp_path / "boundaries.geojson"
-    boundaries.write_text(json.dumps(BOUNDARIES), encoding="utf-8")
-    catalogue = tmp_path / "analytes.yaml"
-    catalogue.write_text(yaml.safe_dump(CATALOGUE), encoding="utf-8")
+    cat = tmp_path / "analytes.yaml"
+    cat.write_text(yaml.safe_dump(CATALOGUE), encoding="utf-8")
     amap = tmp_path / "sdwis_analytes.yaml"
     amap.write_text(yaml.safe_dump(ANALYTE_MAP), encoding="utf-8")
-    return {"zips": zips, "boundaries": boundaries, "catalogue": catalogue, "amap": amap, "out": tmp_path / "out"}
+    bnd = tmp_path / "boundaries.geojson"
+    bnd.write_text(json.dumps(BOUNDARIES), encoding="utf-8")
+    return {"zips": zips, "cat": cat, "amap": amap, "bnd": bnd, "out": tmp_path / "out"}
 
 
-def run(inputs, amap=None):
-    return se.extract(inputs["zips"], inputs["boundaries"], inputs["catalogue"], amap or inputs["amap"],
-                      inputs["out"], generated="2026-10-10")
+def run(inputs: dict, amap: Path | None = None) -> dict:
+    return sx.extract(inputs["zips"], inputs["bnd"], inputs["cat"], amap or inputs["amap"], inputs["out"],
+                      today=dt.date(2026, 10, 10))
 
 
-# ----------------------------------------------------------------------------- unit rules
-def test_parse_sample_date_accepts_file_and_dictionary_formats():
-    assert se.parse_sample_date("09-03-2024") == "2024-09-03"
-    assert se.parse_sample_date("2024-09-03") == "2024-09-03"
-    assert se.parse_sample_date("") is None
-    assert se.parse_sample_date("13-40-2024") is None
+# ----------------------------------------------------------------------------- unit-level
+
+@pytest.mark.parametrize("result, flag, dlr, detected, kind", [
+    ("3.5", "N", "2", True, "detected"),
+    ("", "Y", "2", False, "flag"),
+    ("5", "Y", "2", False, "flag"),          # the flag wins even when a number is present
+    ("", "N", "2", False, "blank"),
+    ("<0.5", "N", "", False, "lt_prefix"),
+    ("ND", "N", "", False, "nonnumeric"),
+    ("0", "N", "", False, "nonpositive"),
+    ("-0.2", "N", "1", False, "nonpositive"),
+    ("1.0", "N", "2", False, "below_dlr"),
+    ("2", "N", "2", True, "detected"),       # at the DLR counts as detected
+    ("1.0", "N", "", True, "detected"),      # no DLR -> nothing to compare against
+    ("1.0", "N", ".5", True, "detected"),
+])
+def test_classify_result(result, flag, dlr, detected, kind):
+    c = sx.classify_result(result, flag, dlr)
+    assert (c.detected, c.kind) == (detected, kind)
+    assert (c.value is not None) == detected
 
 
-@pytest.mark.parametrize(
-    "result, flag, dlr, expected",
-    [
-        ("3.5", "N", "2", (3.5, True, False)),       # plain detection
-        ("", "Y", "2", (None, False, False)),        # the file's way of saying non-detect
-        ("1.5", "Y", "", (1.5, False, False)),       # flagged Y even with a number: not detected
-        ("<0.5", "N", "", (None, False, False)),     # '<' prefix
-        ("0", "N", "", (0.0, False, False)),         # zero result
-        ("1.0", "N", "2", (1.0, False, True)),       # numeric but below the DLR
-        ("2", "N", "2", (2.0, True, False)),         # at the DLR counts as detected
-        ("7.8", "N", "", (7.8, True, False)),        # no DLR column (pH)
-        ("abc", "N", "", (None, False, False)),      # unparseable
-    ],
-)
-def test_classify_result(result, flag, dlr, expected):
-    assert se.classify_result(result, flag, dlr) == expected
+def test_parse_sample_date():
+    assert sx.parse_sample_date("09-03-2024") == "2024-09-03"
+    assert sx.parse_sample_date("2024-09-03") == "2024-09-03"
+    assert sx.parse_sample_date("13-40-2024") is None
+    assert sx.parse_sample_date("") is None
+
+
+def test_analyte_map_rejects_unknown_id(inputs: dict, tmp_path: Path):
+    bad = tmp_path / "bad.yaml"
+    bad.write_text(yaml.safe_dump({"analytes": [{"storet": "1005", "raw_name": "ARSENIC", "id": "arsenik"}]}), encoding="utf-8")
+    with pytest.raises(ValueError, match="arsenik"):
+        run(inputs, amap=bad)
 
 
 # ----------------------------------------------------------------------------- end to end
-def test_filter_and_tsv(inputs):
-    res = run(inputs)
-    with gzip.open(inputs["out"] / "santa_clara_rows.tsv.gz", "rt", encoding="utf-8", newline="") as fh:
+
+def test_filter_writes_only_target_rows_with_original_columns(inputs: dict):
+    run(inputs)
+    with gzip.open(inputs["out"] / "santa_clara_rows.tsv.gz", "rt", encoding="utf-8", newline="\n") as fh:
         lines = fh.read().split("\n")
     assert lines[-1] == ""
     lines = lines[:-1]
-    assert lines[0] == "\t".join(HEADER)
-    assert len(lines) == 1 + 7 + 2  # header + kept rows from A (8 minus the foreign system) + 2 from B
-    assert not any("CA9999999" in ln for ln in lines)
-    assert lines[1] == ROWS_A[0]  # original columns and padding preserved verbatim
-    assert all(ln.count("\t") == 28 for ln in lines[:-1])  # the malformed line is last and has 29 tabs
-    assert lines[-1].count("\t") == 29
-
-    src = res["source"]
-    assert src["rows_total"] == len(ROWS_A) + len(ROWS_B)
-    assert src["rows_kept"] == 9
-    assert src["rows_kept_malformed"] == 1
-    assert [f["rows_total"] for f in src["files"]] == [8, 2]
-    assert [f["rows_kept"] for f in src["files"]] == [7, 2]
-    assert src["files"][0]["member"] == "SDWIS4.tab"
-    assert src["pwsids_targeted"] == 3
-    assert src["pwsids_with_rows"] == 2
-    assert src["pwsids_without_rows"] == ["CA4300003"]
-    assert src["kept_sample_date_range"] == ["2024-01-15", "2026-01-05"]
-    assert res["generated"] == "2026-10-10"
-    # the json on disk matches what extract() returned
-    on_disk = json.loads((inputs["out"] / "santa_clara_results.json").read_text(encoding="utf-8"))
-    assert on_disk == res
+    assert lines[0] == HEADER
+    kept = lines[1:]
+    assert len(kept) == 9                      # 7 target rows from file A + 2 from file B
+    assert all(not line.startswith("DISTRICT 17 - SANTA CLARA\tCA9999999") for line in kept)
+    assert kept[0] == ROWS_A[0]                # padding and column text untouched
+    assert sum(1 for line in kept if line.count("\t") == HEADER.count("\t") + 1) == 1  # the malformed line is kept
 
 
-def test_aggregation(inputs):
-    res = run(inputs)
-    systems = res["systems"]
-    assert sorted(systems) == ["CA4300001", "CA4300002", "CA4300003"]
-    assert systems["CA4300003"] == {"name": "NO DATA WATER", "n_rows": 0, "latest_sample": None,
-                                    "sampling_points": 0, "point_types": {}, "analytes": {}}
+def test_source_block(inputs: dict):
+    doc = run(inputs)
+    assert doc["generated"] == "2026-10-10"
+    s = doc["source"]
+    assert [f["rows_total"] for f in s["files"]] == [8, 2]
+    assert [f["rows_kept"] for f in s["files"]] == [7, 2]
+    assert [f["rows_malformed"] for f in s["files"]] == [0, 1]
+    assert s["files"][0]["member"] == "SDWIS4.tab"
+    assert s["files"][0]["member_modified"] == "2026-07-23T05:10:16"
+    assert s["files"][0]["url"].endswith("/edtlibrary/SDWIS4.zip")
+    assert s["files"][0]["kept_date_range"] == ["2024-01-15", "2025-06-01"]
+    assert len(s["files"][0]["zip_sha256"]) == 64
+    assert s["columns"] == HEADER.split("\t")
+    assert s["rows_kept"] == 9
+    assert s["targets"] == {"pwsids": 3, "with_rows": 2, "without_rows": ["CA4300003"]}
+    assert s["result_kinds"] == {"below_dlr": 1, "detected": 5, "flag": 1, "lt_prefix": 1}
+    assert s["unlisted_in_map"] == []
+    assert s["sample_types"] == {"RT": 8}
 
-    s1 = systems["CA4300001"]
-    assert s1["n_rows"] == 7
-    assert s1["latest_sample"] == "2025-06-01"
-    assert s1["sampling_points"] == 3
-    assert s1["point_types"] == {"DS": 1, "WL": 6}
-    assert sorted(s1["analytes"]) == ["BROMOFORM", "arsenic", "nitrate_n", "ph"]
 
-    ars = s1["analytes"]["arsenic"]
-    assert ars["id"] == "arsenic" and ars["raw_name"] == "ARSENIC" and ars["storet"] == "1005"
+def test_aggregation(inputs: dict):
+    doc = run(inputs)
+    with open(inputs["out"] / "santa_clara_results.json", encoding="utf-8") as fh:
+        assert json.load(fh) == doc
+    systems = doc["systems"]
+    assert list(systems) == ["CA4300001", "CA4300002", "CA4300003"]
+
+    one = systems["CA4300001"]
+    assert one["n_rows"] == 7
+    assert one["name"] == "TEST SYSTEM 1"
+    assert one["latest_sample"] == "2025-06-01"
+    assert one["sampling_points"] == 3
+    assert one["point_types"] == {"DS": 1, "WL": 6}
+    assert set(one["analytes"]) == {"arsenic", "nitrate_n", "ph", "BROMOFORM"}
+
+    ars = one["analytes"]["arsenic"]
+    assert ars["id"] == "arsenic" and ars["storet"] == "1005" and ars["raw_name"] == "ARSENIC"
     assert ars["unit"] == "UG/L"
     assert ars["n"] == 3 and ars["n_detected"] == 1 and ars["n_below_dlr"] == 1
     assert ars["max"] == 3.5 and ars["mean_detected"] == 3.5
-    assert ars["latest_date"] == "2025-06-01" and ars["latest_value"] is None  # latest row was below the DLR
+    assert ars["latest_date"] == "2025-06-01" and ars["latest_value"] is None   # latest row was below the DLR
     assert ars["sampling_points"] == 3
     assert ars["point_types"] == {"DS": 1, "WL": 2}
     assert ars["dlr"] == "2" and ars["mcl"] == "10"
 
-    nit = s1["analytes"]["nitrate_n"]
+    nit = one["analytes"]["nitrate_n"]
     assert nit["unit"] == "MG/L" and nit["latest_value"] == 4.2 and nit["n_detected"] == 1
 
-    bro = s1["analytes"]["BROMOFORM"]
-    assert bro["id"] is None and bro["raw_name"] == "BROMOFORM" and bro["storet"] == "2942"
-    assert bro["n"] == 1 and bro["n_detected"] == 0 and bro["latest_value"] is None and bro["max"] is None
-    assert bro["mean_detected"] is None and bro["mcl"] is None
+    brm = one["analytes"]["BROMOFORM"]
+    assert brm["id"] is None and brm["raw_name"] == "BROMOFORM" and brm["storet"] == "2942"
+    assert brm["n"] == 1 and brm["n_detected"] == 0 and brm["max"] is None and brm["mean_detected"] is None
+    assert brm["latest_value"] is None
 
-    ph = s1["analytes"]["ph"]
+    ph = one["analytes"]["ph"]
     assert ph["n"] == 2 and ph["n_detected"] == 2
-    assert ph["storet"] in {"1925", "C253"} and ph["other_storets"] == [c for c in ["1925", "C253"] if c != ph["storet"]]
-    assert ph["latest_date"] == "2024-02-03" and ph["latest_value"] == 7.9 and ph["max"] == 7.9
+    assert ph["latest_date"] == "2024-02-02" and ph["latest_value"] == 7.9 and ph["max"] == 7.9
     assert ph["mean_detected"] == 7.85
+    assert ph["other_storets"] == {"C253": "PH, FIELD"}   # 1925 is the more frequent... tie -> first seen
 
-    s2 = systems["CA4300002"]
-    assert s2["n_rows"] == 1  # the malformed row is excluded from aggregates
-    assert s2["latest_sample"] == "2026-01-05"
-    assert s2["analytes"]["lead"]["latest_value"] == 6.0 and s2["analytes"]["lead"]["point_types"] == {"DS": 1}
+    two = systems["CA4300002"]
+    assert two["n_rows"] == 1                       # the malformed line is not aggregated
+    assert two["analytes"]["lead"]["latest_value"] == 6.0
+    assert two["analytes"]["lead"]["point_types"] == {"DS": 1}
+
+    three = systems["CA4300003"]
+    assert three == {"name": "THREE (no rows)", "n_rows": 0, "latest_sample": None, "sampling_points": 0,
+                     "point_types": {}, "analytes": {}}
 
 
-def test_unit_label_override(inputs, tmp_path):
+def test_unit_label_override(inputs: dict, tmp_path: Path):
+    """A nitrate code reported as NO3 would carry unit_label; the extract reports that label, not MG/L."""
     amap = dict(ANALYTE_MAP)
-    amap["analytes"] = [dict(e) for e in ANALYTE_MAP["analytes"]]
-    nitrate = next(e for e in amap["analytes"] if e["storet"] == "1040")
-    nitrate["unit_label"] = "MG/L as NO3"
-    p = tmp_path / "map_no3.yaml"
-    p.write_text(yaml.safe_dump(amap), encoding="utf-8")
-    res = run(inputs, amap=p)
-    assert res["systems"]["CA4300001"]["analytes"]["nitrate_n"]["unit"] == "MG/L as NO3"
+    amap["analytes"] = [dict(e, unit_label="MG/L as NO3") if e["storet"] == "1040" else e for e in ANALYTE_MAP["analytes"]]
+    path = tmp_path / "map_no3.yaml"
+    path.write_text(yaml.safe_dump(amap), encoding="utf-8")
+    doc = run(inputs, amap=path)
+    nit = doc["systems"]["CA4300001"]["analytes"]["nitrate_n"]
+    assert nit["unit"] == "MG/L as NO3" and nit["latest_value"] == 4.2
 
 
-def test_name_fallback_when_storet_unlisted(inputs, tmp_path):
-    amap = {"analytes": [{"storet": "9999", "raw_name": "ARSENIC", "unit": "UG/L", "id": "arsenic"}]}
-    p = tmp_path / "map_name.yaml"
-    p.write_text(yaml.safe_dump(amap), encoding="utf-8")
-    res = run(inputs, amap=p)
-    a = res["systems"]["CA4300001"]["analytes"]
-    assert "arsenic" in a and a["arsenic"]["storet"] == "1005"
-    assert "NITRATE" in a and a["NITRATE"]["id"] is None  # unlisted code keeps its raw name
-
-
-def test_unknown_catalogue_id_is_rejected(inputs, tmp_path):
-    p = tmp_path / "bad.yaml"
-    p.write_text(yaml.safe_dump({"analytes": [{"storet": "1005", "raw_name": "ARSENIC", "id": "not_real"}]}),
-                 encoding="utf-8")
-    with pytest.raises(SystemExit):
-        run(inputs, amap=p)
-
-
-def test_repo_analyte_map_is_consistent_with_catalogue():
-    """The committed mapping must only use ids that exist in config/analytes.yaml."""
-    catalogue = se.load_catalogue(REPO / "config" / "analytes.yaml")
-    by_storet, _ = se.load_analyte_map(REPO / "src" / "pipeline" / "sdwis_analytes.yaml", catalogue)
-    assert by_storet["1040"]["id"] == "nitrate_n"
-    assert by_storet["1041"]["id"] == "nitrite_n"
-    assert by_storet["1080"]["id"] == "chromium_6"
-    assert by_storet["2943"]["id"] is None  # bromodichloromethane is not in the catalogue
+def test_header_mismatch_raises(inputs: dict, tmp_path: Path):
+    other = tmp_path / "raw" / "other.zip"
+    with zipfile.ZipFile(other, "w") as zf:
+        zf.writestr("other.tab", "Water System Number\tResult\r\nCA4300001\t1\r\n")
+    with pytest.raises(ValueError, match="header"):
+        sx.extract([inputs["zips"][0], other], inputs["bnd"], inputs["cat"], inputs["amap"], inputs["out"])

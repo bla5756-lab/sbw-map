@@ -9,6 +9,25 @@ const PRIMARY_GROUPS = new Set(['inorganic', 'radiological', 'disinfection', 'le
 const DEFAULT_ENABLED = ['arsenic', 'nitrate_n', 'chromium_6', 'tthm', 'haa5', 'lead', 'copper', 'uranium', 'gross_alpha', 'pfoa', 'pfos'];
 const KEEP_UPPER = new Set(['CWSC', 'MWC', 'INC', 'LLC', 'RV', 'USD', 'JUSD', 'SD', 'UCSC', 'NASA', 'CSP', 'SCC', 'HKN', 'WC', 'CO', 'EVG', 'EDV', 'COY', 'NSJ', 'CAL', 'AM']);
 
+const GLYPHS = 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf';
+const offlineStyle = (theme) => ({ version: 8, name: 'offline', glyphs: GLYPHS, sources: {}, layers: [{ id: 'bg', type: 'background', paint: { 'background-color': theme === 'dark' ? '#0b1020' : '#eef2f7' } }] });
+const SVG_NS = 'http://www.w3.org/2000/svg';
+function webglAvailable() {
+  try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl') || c.getContext('experimental-webgl')); } catch (_) { return false; }
+}
+function notice(msg, sticky) {
+  const n = $('#notice'); if (!n) return;
+  n.innerHTML = `<span>${msg}</span><button class="link" id="notice-close">dismiss</button>`;
+  n.classList.remove('hidden');
+  $('#notice-close').addEventListener('click', () => n.classList.add('hidden'));
+  if (!sticky) setTimeout(() => n.classList.add('hidden'), 12000);
+}
+function fatal(msg) {
+  const l = $('#loading');
+  if (l && !l.classList.contains('hidden')) l.innerHTML = `<div class="err"><b>Something broke while starting the map.</b><br>${esc(msg)}<br><br>Reload the page; if it persists, send this message along.</div>`;
+  else notice(`Error: ${esc(msg)}`, true);
+}
+
 const S = {
   site: null, geo: null, enabled: new Set(), solo: null, source: 'ccr', showNonCommunity: true, showLabels: true,
   search: '', theme: 'dark', hoverId: null, selected: null, map: null, ready: false, byFid: new Map(),
@@ -104,7 +123,7 @@ function recolor() {
       else if (sc.kind === 'not_required') counts.notRequired++;
     }
   }
-  S.map.getSource('systems').setData(S.geo);
+  if (S.svg) svgRecolor(); else S.map.getSource('systems').setData(S.geo);
   syncLabels();
   $('#stat-value').textContent = counts.value;
   $('#stat-gray').textContent = counts.gray;
@@ -154,6 +173,7 @@ function addLayers() {
     'line-color': ['case', selected, '#38bdf8', hover, '#ffffff', S.theme === 'dark' ? '#e5e7eb' : '#0f172a'],
     'line-width': ['case', selected, 2.5, hover, 2, 0.7],
     'line-opacity': ['case', selected, 1, hover, 0.95, S.theme === 'dark' ? 0.35 : 0.45] } });
+  if (S.offline) return; // no glyph server reachable: skip the label layers
   const labelPaint = { 'text-color': S.theme === 'dark' ? '#f1f5f9' : '#0f172a', 'text-halo-color': S.theme === 'dark' ? '#0b1020' : '#ffffff', 'text-halo-width': 1.4 };
   map.addLayer({ id: 'sys-label-big', type: 'symbol', source: 'labels', minzoom: 9, filter: ['all', vis, ['>=', ['get', 'population'], 5000]],
     layout: { 'text-field': ['get', 'label'], 'text-font': ['Noto Sans Regular'], 'text-size': ['interpolate', ['linear'], ['zoom'], 9, 10, 12, 13], 'text-max-width': 9, 'text-allow-overlap': false, 'text-variable-anchor': ['center', 'top', 'bottom'], 'text-radial-offset': 0.3, visibility: S.showLabels ? 'visible' : 'none' }, paint: labelPaint });
@@ -182,7 +202,7 @@ function labelPoint(g) {
   return ringCentroid(best[0]);
 }
 function syncLabels() {
-  if (!S.labels) return;
+  if (!S.labels || !S.map) return;
   for (const f of S.labels.features) { const src = S.byFid.get(f.properties.fid); f.properties.visible = src.properties.visible; }
   S.map.getSource('labels')?.setData(S.labels);
 }
@@ -206,18 +226,33 @@ function topFeatureAt(point) {
 }
 function setHover(fid) {
   if (S.hoverId === fid) return;
+  if (S.svg) { S.svg.paths.get(S.hoverId)?.classList.remove('hover'); S.hoverId = fid; S.svg.paths.get(fid)?.classList.add('hover'); return; }
   if (S.hoverId != null) S.map.setFeatureState({ source: 'systems', id: S.hoverId }, { hover: false });
   S.hoverId = fid;
   if (fid != null) S.map.setFeatureState({ source: 'systems', id: fid }, { hover: true });
 }
 function setSelected(fid) {
+  if (S.svg) { S.svg.paths.get(S.selected)?.classList.remove('selected'); S.selected = fid; S.svg.paths.get(fid)?.classList.add('selected'); return; }
   if (S.selected != null) S.map.setFeatureState({ source: 'systems', id: S.selected }, { selected: false });
   S.selected = fid;
   if (fid != null) S.map.setFeatureState({ source: 'systems', id: fid }, { selected: true });
 }
-function initMap() {
-  const map = new maplibregl.Map({ container: 'map', style: STYLES[S.theme], center: [-121.86, 37.26], zoom: 9.6, minZoom: 7, maxZoom: 16, attributionControl: { compact: true }, hash: false });
+async function styleFor(theme) {
+  try {
+    const r = await fetch(STYLES[theme], { signal: AbortSignal.timeout(7000) });
+    if (!r.ok) throw new Error(`style ${r.status}`);
+    return STYLES[theme];
+  } catch (err) {
+    notice('Basemap tiles are unreachable from this browser; showing system boundaries on a plain background.', true);
+    S.offline = true;
+    return offlineStyle(theme);
+  }
+}
+async function initMap() {
+  const style = await styleFor(S.theme);
+  const map = new maplibregl.Map({ container: 'map', style, center: [-121.86, 37.26], zoom: 9.6, minZoom: 7, maxZoom: 16, attributionControl: { compact: true }, hash: false });
   S.map = map;
+  setTimeout(() => { if (!S.ready) { notice('The basemap did not finish loading; switching to a plain background.', true); S.offline = true; map.setStyle(offlineStyle(S.theme)); } }, 12000);
   map.addControl(new maplibregl.NavigationControl({ visualizePitch: false }), 'bottom-right');
   map.addControl(new maplibregl.ScaleControl({ unit: 'imperial' }), 'bottom-right');
   map.on('style.load', () => { addLayers(); S.ready = true; recolor(); $('#loading').classList.add('hidden'); });
@@ -247,7 +282,87 @@ function setTheme(theme) {
   document.body.dataset.theme = theme;
   $('#btn-theme').textContent = theme === 'dark' ? 'Light basemap' : 'Dark basemap';
   try { localStorage.setItem('sbw-theme', theme); } catch (_) { /* private mode */ }
-  if (S.map) { S.ready = false; S.map.setStyle(STYLES[theme]); }
+  if (S.svg) { svgRecolor(); return; }
+  if (S.map) { S.ready = false; styleFor(theme).then((st) => S.map.setStyle(st)); }
+}
+
+/* ---------- SVG fallback renderer (no WebGL) ---------- */
+function mercator(lng, lat) {
+  const s = Math.sin((lat * Math.PI) / 180);
+  return [(lng + 180) / 360, 0.5 - Math.log((1 + s) / (1 - s)) / (4 * Math.PI)];
+}
+function initSvgMap() {
+  const box = $('#map'); box.classList.add('svg-mode'); box.innerHTML = '';
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('width', '100%'); svg.setAttribute('height', '100%');
+  svg.innerHTML = '<defs><pattern id="hatch" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)"><rect width="8" height="8" fill="rgba(239,68,68,0.18)"/><line x1="0" y1="0" x2="0" y2="8" stroke="#ef4444" stroke-width="3"/></pattern></defs>';
+  const root = document.createElementNS(SVG_NS, 'g'); root.id = 'svg-root';
+  const gPaths = document.createElementNS(SVG_NS, 'g'); const gLabels = document.createElementNS(SVG_NS, 'g');
+  root.appendChild(gPaths); root.appendChild(gLabels); svg.appendChild(root); box.appendChild(svg);
+  let minx = 1, miny = 1, maxx = 0, maxy = 0;
+  const rings = (g) => (g.type === 'Polygon' ? g.coordinates : g.coordinates.flat(1));
+  for (const f of S.geo.features) for (const ring of rings(f.geometry)) for (const [lng, lat] of ring) { const [x, y] = mercator(lng, lat); minx = Math.min(minx, x); miny = Math.min(miny, y); maxx = Math.max(maxx, x); maxy = Math.max(maxy, y); }
+  const W = box.clientWidth || 1000, H = box.clientHeight || 800, pad = 40;
+  const k0 = Math.min((W - 2 * pad) / (maxx - minx), (H - 2 * pad) / (maxy - miny));
+  const ox = (W - (maxx - minx) * k0) / 2, oy = (H - (maxy - miny) * k0) / 2;
+  const px = (lng, lat) => { const [x, y] = mercator(lng, lat); return [(x - minx) * k0 + ox, (y - miny) * k0 + oy]; };
+  const st = { svg, root, gLabels, k: 1, tx: 0, ty: 0, paths: new Map(), labels: new Map(), W, H };
+  S.svg = st;
+  const feats = [...S.geo.features].sort((a, b) => (b.properties.area || 0) - (a.properties.area || 0)); // big first, small on top
+  for (const f of feats) {
+    const d = rings(f.geometry).map((ring) => ring.map(([lng, lat], i) => { const [x, y] = px(lng, lat); return `${i ? 'L' : 'M'}${x.toFixed(2)} ${y.toFixed(2)}`; }).join('') + 'Z').join('');
+    const path = document.createElementNS(SVG_NS, 'path');
+    path.setAttribute('d', d); path.classList.add('sys'); path.dataset.fid = f.properties.fid;
+    path.addEventListener('mousemove', (e) => { setHover(f.properties.fid); renderTooltip(S.site.systems[f.properties.pwsid]); const tip = $('#tooltip'); tip.classList.remove('hidden'); tip.style.left = Math.min(e.clientX + 16, window.innerWidth - tip.offsetWidth - 12) + 'px'; tip.style.top = Math.min(e.clientY + 16, window.innerHeight - tip.offsetHeight - 12) + 'px'; });
+    path.addEventListener('mouseleave', () => { setHover(null); $('#tooltip').classList.add('hidden'); });
+    path.addEventListener('click', (e) => { e.stopPropagation(); openDetail(f.properties.pwsid, f.properties.fid); });
+    gPaths.appendChild(path); st.paths.set(f.properties.fid, path);
+    const ring = rings(f.geometry).sort((a, b) => b.length - a.length)[0];
+    let cx = 0, cy = 0; for (const [lng, lat] of ring) { const [x, y] = px(lng, lat); cx += x; cy += y; }
+    const text = document.createElementNS(SVG_NS, 'text');
+    text.setAttribute('x', (cx / ring.length).toFixed(1)); text.setAttribute('y', (cy / ring.length).toFixed(1));
+    text.classList.add('lbl'); text.dataset.pop = f.properties.population; text.textContent = f.properties.label;
+    gLabels.appendChild(text); st.labels.set(f.properties.fid, text);
+  }
+  const apply = () => {
+    root.setAttribute('transform', `translate(${st.tx} ${st.ty}) scale(${st.k})`);
+    for (const [fid, text] of st.labels) {
+      const f = S.byFid.get(fid);
+      const show = S.showLabels && f.properties.visible !== false && (st.k >= 4 || f.properties.population >= 5000);
+      text.style.display = show ? '' : 'none';
+      text.setAttribute('font-size', (12 / st.k).toFixed(2));
+      text.setAttribute('stroke-width', (3 / st.k).toFixed(2));
+    }
+  };
+  st.apply = apply;
+  svg.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const rect = svg.getBoundingClientRect(); const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    const k = Math.min(60, Math.max(0.6, st.k * Math.exp(-e.deltaY * 0.0016)));
+    st.tx = mx - (mx - st.tx) * (k / st.k); st.ty = my - (my - st.ty) * (k / st.k); st.k = k; apply();
+  }, { passive: false });
+  let drag = null;
+  svg.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, y: e.clientY, tx: st.tx, ty: st.ty, moved: false }; svg.setPointerCapture(e.pointerId); });
+  svg.addEventListener('pointermove', (e) => { if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; if (Math.abs(dx) + Math.abs(dy) > 3) drag.moved = true; st.tx = drag.tx + dx; st.ty = drag.ty + dy; apply(); });
+  svg.addEventListener('pointerup', () => { drag = null; });
+  svg.addEventListener('click', (e) => { if (e.target === svg || e.target.tagName === 'text') closeDetail(); });
+  apply();
+  S.ready = true;
+  recolor();
+  $('#loading').classList.add('hidden');
+  notice('This browser has no WebGL, so the street basemap is off; system boundaries, colors, hover and detail all work. Scroll to zoom, drag to pan.', true);
+}
+function svgRecolor() {
+  const st = S.svg; if (!st) return;
+  for (const f of S.geo.features) {
+    const p = st.paths.get(f.properties.fid); if (!p) continue;
+    const kind = f.properties.kind, ratio = f.properties.ratio;
+    p.style.display = f.properties.visible ? '' : 'none';
+    if (kind === 'not_required') { p.setAttribute('fill', 'url(#hatch)'); p.setAttribute('fill-opacity', '0.9'); }
+    else if (kind === 'none') { p.setAttribute('fill', '#000'); p.setAttribute('fill-opacity', '0'); }
+    else { p.setAttribute('fill', kind === 'value' ? rampColor(Math.max(0, ratio)) : KIND_COLOR[kind]); p.setAttribute('fill-opacity', kind === 'nd' ? '0.45' : kind === 'not_in_report' ? '0.42' : kind === 'no_report' ? '0.5' : '0.62'); }
+  }
+  st.apply();
 }
 
 /* ---------- tooltip / detail ---------- */
@@ -285,6 +400,7 @@ function openDetail(pwsid, fid) {
   let html = `<h2>${esc(titleCase(sys.name))}</h2><p class="sub">${esc(sys.pwsid)} · ${esc(titleCase(sys.classification || ''))} · ${esc(titleCase(sys.city || ''))} · pop ${sys.population?.toLocaleString() ?? '—'} · ${sys.connections?.toLocaleString() ?? '—'} connections</p>${pill}`;
   html += '<div class="card"><h3>Consumer Confidence Report</h3>';
   if (r.status === 'found') {
+    html += `<div class="report-actions">${r.file ? `<a class="btn-primary" href="/${esc(r.file)}" target="_blank" rel="noopener">Open the ${esc(r.data_year ?? '')} report ${r.format === 'html' ? '' : '(PDF)'}</a>` : ''}${r.url ? `<a class="btn" href="${esc(r.url)}" target="_blank" rel="noopener">Original source</a>` : ''}</div>`;
     html += `<div class="kv"><span>Title</span><span>${esc(r.title || '—')}</span><span>Data year</span><span>${esc(r.data_year ?? '—')}</span><span>Document</span><span>${r.file ? `<a href="/${esc(r.file)}" target="_blank" rel="noopener">open saved copy</a>` : '—'}${r.url ? ` · <a href="${esc(r.url)}" target="_blank" rel="noopener">source</a>` : ''}</span><span>Retrieved</span><span>${esc(r.retrieved || '—')}</span></div>`;
     if (r.sources_described) html += `<p><b>Water sources:</b> ${esc(r.sources_described)}</p>`;
     if (r.violations?.length) html += '<p><b>Violations / exceedances disclosed:</b></p>' + r.violations.map((v) => `<div class="violation">${esc(v)}</div>`).join('');
@@ -433,8 +549,8 @@ function readHash() {
 function setSource(src) {
   S.source = src;
   document.querySelectorAll('.seg-btn').forEach((b) => { const on = b.dataset.source === src; b.classList.toggle('active', on); b.setAttribute('aria-selected', on); });
-  $('#stats .stat:nth-child(2) span:last-child').textContent = src === 'ccr' ? 'not in report' : 'not sampled';
-  $('#stats .stat:nth-child(3) span:last-child').textContent = src === 'ccr' ? 'no report' : 'no lab data';
+  $('#stats .stat:nth-child(2) .lbl').textContent = src === 'ccr' ? 'not in report' : 'not sampled';
+  $('#stats .stat:nth-child(3) .lbl').textContent = src === 'ccr' ? 'no report' : 'no lab data';
   renderSidebar(); recolor();
 }
 
@@ -458,9 +574,10 @@ async function boot() {
   const c = site.counts;
   $('#subtitle').textContent = `${site.region} · ${c.systems} systems · ${c.reports_found} reports found · generated ${site.generated.slice(0, 10)}`;
   $('#about-meta').textContent = `Built ${site.generated}. Boundaries: ${c.systems} systems (${c.community} community). Reports found: ${c.reports_found}; not found: ${c.reports_not_found}; not required: ${c.reports_not_required}. Lab layer: ${c.lab_systems} systems.`;
-  S.api = { openDetail, closeDetail, scoreSystem, recolor, setSource, renderSidebar };
+  S.api = { openDetail, closeDetail, scoreSystem, recolor, setSource, renderSidebar, renderReports };
   setSource(S.source);
-  initMap();
+  S.renderer = webglAvailable() && !location.hash.includes('svg=1') ? 'maplibre' : 'svg';
+  try { if (S.renderer === 'svg') initSvgMap(); else await initMap(); } catch (err) { console.error(err); if (S.renderer !== 'svg') { S.renderer = 'svg'; try { initSvgMap(); } catch (e2) { fatal(e2.message); } } else fatal(err.message); }
   // controls
   document.querySelectorAll('.seg-btn').forEach((b) => b.addEventListener('click', () => { if (!b.disabled) setSource(b.dataset.source); }));
   $('#search').addEventListener('input', (e) => { S.search = e.target.value; renderSidebar(); });
@@ -470,13 +587,34 @@ async function boot() {
   $('#solo-exit').addEventListener('click', () => { S.solo = null; renderSidebar(); recolor(); });
   $('#toggle-noncommunity').checked = S.showNonCommunity;
   $('#toggle-noncommunity').addEventListener('change', (e) => { S.showNonCommunity = e.target.checked; recolor(); });
-  $('#toggle-labels').addEventListener('change', (e) => { S.showLabels = e.target.checked; for (const id of ['sys-label-big', 'sys-label-small']) if (S.map.getLayer(id)) S.map.setLayoutProperty(id, 'visibility', S.showLabels ? 'visible' : 'none'); });
+  $('#toggle-labels').addEventListener('change', (e) => { S.showLabels = e.target.checked; if (S.svg) { S.svg.apply(); return; } for (const id of ['sys-label-big', 'sys-label-small']) if (S.map.getLayer(id)) S.map.setLayoutProperty(id, 'visibility', S.showLabels ? 'visible' : 'none'); });
+  $('#btn-reports').addEventListener('click', () => { renderReports(); $('#reports').classList.remove('hidden'); });
+  $('#reports .modal-close').addEventListener('click', () => $('#reports').classList.add('hidden'));
+  $('#reports').addEventListener('click', (e) => { if (e.target.id === 'reports') $('#reports').classList.add('hidden'); });
   $('#btn-theme').addEventListener('click', () => setTheme(S.theme === 'dark' ? 'light' : 'dark'));
   $('#detail-close').addEventListener('click', closeDetail);
   $('#about-link').addEventListener('click', (e) => { e.preventDefault(); $('#about').classList.remove('hidden'); });
   $('#about .modal-close').addEventListener('click', () => $('#about').classList.add('hidden'));
   $('#about').addEventListener('click', (e) => { if (e.target.id === 'about') $('#about').classList.add('hidden'); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeDetail(); $('#about').classList.add('hidden'); } });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeDetail(); $('#about').classList.add('hidden'); $('#reports').classList.add('hidden'); } });
 }
+function renderReports() {
+  const body = $('#reports-body');
+  const systems = Object.values(S.site.systems).sort((a, b) => (b.population || 0) - (a.population || 0));
+  const found = systems.filter((s) => s.report?.status === 'found');
+  const missing = systems.filter((s) => s.report?.status === 'not_found');
+  let html = `<p class="sub">${found.length} reports found · ${missing.length} community systems without a locatable report · ${systems.length - found.length - missing.length} non-community systems (no report required)</p>`;
+  html += '<table class="vals"><thead><tr><th>Water system</th><th>Population</th><th>Report</th><th></th></tr></thead><tbody>';
+  for (const s of found) {
+    const r = s.report;
+    html += `<tr><td><b>${esc(titleCase(s.name))}</b><div class="sub" style="margin:0">${esc(s.pwsid)}</div></td><td class="num">${s.population?.toLocaleString() ?? '—'}</td><td>${esc(r.data_year ?? '')} · ${esc((r.format || 'pdf').toUpperCase())}${r.pages ? ` · ${r.pages} pp` : ''}</td><td class="num">${r.file ? `<a class="btn-primary small-btn" href="/${esc(r.file)}" target="_blank" rel="noopener">Open</a>` : ''} ${r.url ? `<a class="link" href="${esc(r.url)}" target="_blank" rel="noopener">source</a>` : ''} <button class="link" data-detail="${esc(s.pwsid)}">map</button></td></tr>`;
+  }
+  html += '</tbody></table>';
+  if (missing.length) html += `<details style="margin-top:12px"><summary class="sub">Community systems with no locatable report (${missing.length})</summary><ul class="search-log">${missing.map((s) => `<li>${esc(titleCase(s.name))} (${esc(s.pwsid)}, pop ${s.population?.toLocaleString() ?? '—'})</li>`).join('')}</ul></details>`;
+  body.innerHTML = html;
+  body.querySelectorAll('[data-detail]').forEach((b) => b.addEventListener('click', () => { $('#reports').classList.add('hidden'); const s = S.site.systems[b.dataset.detail]; openDetail(s.pwsid, s.fid); }));
+}
+window.addEventListener('error', (e) => fatal(e.message || String(e.error)));
+window.addEventListener('unhandledrejection', (e) => fatal(e.reason?.message || String(e.reason)));
 boot();
 })();

@@ -1,0 +1,34 @@
+{
+  "pwsid": "CA4300562",
+  "system_name": "ROSEVIEW HEIGHTS MUTUAL WATER COMPANY",
+  "status": "found",
+  "report": {
+    "data_year": 2025,
+    "title": "2025 Consumer Confidence Report",
+    "url": "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300562&Year=2025&isCert=false",
+    "file": "reports/CA4300562/ccr-2025.pdf",
+    "format": "pdf",
+    "sha256": "6d2dea0b48810a73075a92035ecc39ad82856365fa8d340c0db70e777c381799",
+    "pages": 2,
+    "retrieved": "2026-10-10"
+  },
+  "sources_described": "Water purchased from San Jose Water Company, stored in reservoirs for use in the community, with chlorine added to maintain quality during storage; source-water results are deferred to the San Jose Water Company report (described as attached, but not included in the filed PDF). Report date 06/30/26; contact Tim Schacher.",
+  "search_log": [
+    "WebSearch: \"Roseview Heights Mutual Water\" San Jose \"consumer confidence report\" OR \"water quality report\" -> no relevant result (San Jose Water and SJSU reports only)",
+    "https://sdwis.waterboards.ca.gov/PDWW/JSP/SearchDispatch (POST number=CA4300562) -> tinwsys_is_number=4200, 10517 Crothers Road, San Jose; purchased surface water (SWP); 'No web address provided'",
+    "https://sdwis.waterboards.ca.gov/PDWW/JSP/CCR.jsp?tinwsys_is_number=4200&tinwsys_st_code=CA&Year=2025 -> 'Report' link to the State EAR portal",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300562&Year=2025&isCert=false -> HTTP 200, 2-page PDF = the 2025 CCR used here",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300562&Year=2024&isCert=false -> HTTP 200 2-page PDF, but its content is the 2023 CCR (report date 06/30/24); Year=2023 -> HTTP 404"
+  ],
+  "analytes": [
+    {"id": "total_coliform", "raw_name": "Total Coliform Bacteria", "unit_raw": null, "value": 0, "value_basis": "highest number of detections in a month", "average": null, "range_low": null, "range_high": null, "detected": false, "mcl_printed": "More than 1 sample in a month with a detection", "phg_printed": "0", "source_group": null, "sample_year": 2025, "page": 1, "notes": "Table 1: highest no. of detections (in a mo.) 0; no. of months in violation 0"},
+    {"id": "e_coli", "raw_name": "Fecal Coliform or E. coli", "unit_raw": null, "value": 0, "value_basis": "highest number of detections in the year", "average": null, "range_low": null, "range_high": null, "detected": false, "mcl_printed": "A routine sample and a repeat sample detect total coliform and either sample also detects fecal coliform or E. coli", "phg_printed": "0", "source_group": null, "sample_year": 2025, "page": 1, "notes": "Table 1: detections (in the year) 0; months in violation 0"},
+    {"id": "lead", "raw_name": "Lead", "unit_raw": "ppb", "value": null, "value_basis": "90th_percentile", "average": null, "range_low": null, "range_high": null, "detected": false, "mcl_printed": "15", "phg_printed": "2", "source_group": null, "sample_year": 2026, "page": 1, "notes": "Table 2: sample date printed '09/2026' (as printed; later than the 06/30/26 report date, so probably a typo for 09/2025 or 09/2024); 5 samples; 90th percentile ND; 0 sites exceeding AL; MCLG column printed 2"},
+    {"id": "copper", "raw_name": "Copper", "unit_raw": "ppm", "value": 0.17, "value_basis": "90th_percentile", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "1.3", "phg_printed": "0.17", "source_group": null, "sample_year": 2026, "page": 1, "notes": "Table 2: sample date printed '09/2026' (see lead note); 5 samples; 0 sites exceeding AL; MCLG column printed 0.17 (as printed)"},
+    {"id": "asbestos", "raw_name": "Asbestos", "unit_raw": null, "value": null, "value_basis": "level_detected", "average": null, "range_low": null, "range_high": null, "detected": false, "mcl_printed": "7", "phg_printed": "7", "source_group": null, "sample_year": 2014, "page": 1, "notes": "Table 4: sample date 01/14; level detected ND; range N/A; no unit printed (MFL implied)"},
+    {"id": "tthm", "raw_name": "TTHMs [Total Trihalomethanes]", "unit_raw": "ppb", "value": 18, "value_basis": "level_detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "80", "phg_printed": "N/A", "source_group": null, "sample_year": 2025, "page": 1, "notes": "Table 4: sample date 06/25; range N/A"},
+    {"id": "haa5", "raw_name": "Halocetic Acids", "unit_raw": "ppb", "value": 2.2, "value_basis": "level_detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "60", "phg_printed": "N/A", "source_group": null, "sample_year": 2025, "page": 1, "notes": "Table 4: printed 'Halocetic Acids' (sic, haloacetic acids / HAA5, MCL 60); sample date 06/25; range N/A"}
+  ],
+  "violations": [],
+  "extraction_notes": "Two-page system-specific report; Tables 3 (sodium/hardness) and 5 (secondary) and the terms section say 'see San Jose Water Company report', which is not part of the filed PDF. 'Summary Information for Contaminants Exceeding an MCL or AL...' reads 'None'. The EAR portal's Year=2024 upload actually contains the 2023 report."
+}

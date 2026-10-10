@@ -1,0 +1,44 @@
+{
+  "pwsid": "CA4300571",
+  "system_name": "SULLIVAN MUTUAL WATER",
+  "status": "found",
+  "report": {
+    "data_year": 2025,
+    "title": "2025 Consumer Confidence Report - Sullivan Mutual Water, CA4300571",
+    "url": "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300571&Year=2025&isCert=false",
+    "file": "reports/CA4300571/ccr-2025.pdf",
+    "format": "pdf",
+    "sha256": "6e62790597d5da2a8807b5290f8f3b69d0a608346a7f55a8e0bc2e1c9c2e295a",
+    "pages": 6,
+    "retrieved": "2026-10-10"
+  },
+  "sources_described": "The water system is served by one (1) groundwater well located off Lantz Road.",
+  "search_log": [
+    "WebSearch \"Green Acres Mutual Water\" OR \"Sullivan Mutual Water\" Morgan Hill water quality report -> only aggregator listings and the City of Morgan Hill CCR (different system); no report for Sullivan",
+    "No system website exists (Drinking Water Watch: no web address provided; operator MCSI Water Systems Management (831) 659-5360)",
+    "Santa Clara County Dept. of Environmental Health: not the primacy agency (SWRCB DDW District 17); no county CCR page found",
+    "Drinking Water Watch https://sdwis.waterboards.ca.gov/PDWW/JSP/WaterSystemDetail.jsp?tinwsys_is_number=4203&tinwsys_st_code=CA -> Consumer Confidence Reports menu: 2025, 2024 and 2023 Report + Certification links",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300571&Year=2025&isCert=false -> 6-page text PDF dated June 30, 2026, monitoring period January 1 to December 31, 2025 -> used",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300571&Year=2024&isCert=false -> 20-page PDF '2024 Consumer Confidence Report' dated June 25, 2024 -> older, not used"
+  ],
+  "analytes": [
+    {"id": "lead", "raw_name": "Lead", "unit_raw": "ppb", "value": null, "value_basis": "90th percentile", "average": null, "range_low": null, "range_high": null, "detected": false, "mcl_printed": "15", "phg_printed": "0.2", "source_group": null, "sample_year": 2024, "page": 3, "notes": "Table 1: sample date 9/2024; 5 samples; 90th percentile ND; Range of Results ND; 0 sites exceeding AL; mcl_printed is the Action Level"},
+    {"id": "copper", "raw_name": "Copper", "unit_raw": "ppm", "value": 0.224, "value_basis": "90th percentile", "average": null, "range_low": 0.036, "range_high": 0.320, "detected": true, "mcl_printed": "1.3", "phg_printed": "0.3", "source_group": null, "sample_year": 2024, "page": 3, "notes": "Table 1: sample date 9/2024; 5 samples; 0 sites exceeding AL; mcl_printed is the Action Level"},
+    {"id": "sodium", "raw_name": "Sodium", "unit_raw": "ppm", "value": 31, "value_basis": "level detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "None", "phg_printed": "None", "source_group": null, "sample_year": 2023, "page": 3, "notes": "Table 2; sample date 12/2023; Range of Detections '--'"},
+    {"id": "hardness", "raw_name": "Hardness", "unit_raw": "ppm", "value": 281, "value_basis": "level detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "None", "phg_printed": "None", "source_group": null, "sample_year": 2023, "page": 3, "notes": "Table 2; sample date 12/2023; Range of Detections '--'"},
+    {"id": "barium", "raw_name": "Barium", "unit_raw": "mg/L", "value": 0.127, "value_basis": "level detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "1", "phg_printed": "2", "source_group": null, "sample_year": 2023, "page": 4, "notes": "Table 3; sample date 12/2023; Range '--'"},
+    {"id": "chromium_6", "raw_name": "Chromium (Hexavalent)", "unit_raw": "µg/L", "value": 1.9, "value_basis": "level detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "10", "phg_printed": "0.02", "source_group": null, "sample_year": 2024, "page": 4, "notes": "Table 3; sample date 12/2024; Range '--'"},
+    {"id": "fluoride", "raw_name": "Fluoride", "unit_raw": "µg/L", "value": 0.1, "value_basis": "level detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "2.0", "phg_printed": "1", "source_group": null, "sample_year": 2023, "page": 4, "notes": "Table 3; sample date 12/2023; unit printed as µg/L although the MCL 2.0 is the mg/L standard - copied as printed"},
+    {"id": "nitrate_n", "raw_name": "Nitrate", "unit_raw": "mg/L", "value": 5.1, "value_basis": "level detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "10 (as N)", "phg_printed": "10 (as N)", "source_group": null, "sample_year": 2025, "page": 4, "notes": "Table 3; sample date 12/2025; Range '--'"},
+    {"id": "perchlorate", "raw_name": "Perchlorate", "unit_raw": "µg/L", "value": 1.9, "value_basis": "average", "average": 1.9, "range_low": 1.7, "range_high": 2.1, "detected": true, "mcl_printed": "6", "phg_printed": "1", "source_group": null, "sample_year": 2025, "page": 4, "notes": "Table 3; sample date 2025; Level Detected printed '(1.9)' - parentheses denote an average per the column header"},
+    {"id": "chlorine_residual", "raw_name": "Chlorine", "unit_raw": "mg/L", "value": 0.79, "value_basis": "average", "average": 0.79, "range_low": 0.22, "range_high": 1.19, "detected": true, "mcl_printed": "[4.0 (as Cl2)]", "phg_printed": "[4.0 (as Cl2)]", "source_group": null, "sample_year": 2025, "page": 5, "notes": "Table 3A (distribution); MRDL / MRDLG columns; field measurements taken with coliform monitoring using a HACH DR300 colorimeter"},
+    {"id": "chloride", "raw_name": "Chloride", "unit_raw": "mg/L", "value": 42, "value_basis": "level detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "500", "phg_printed": "NA", "source_group": null, "sample_year": 2023, "page": 5, "notes": "Table 4 (secondary standard); sample date 12/2023; mcl_printed is the SMCL column"},
+    {"id": "color", "raw_name": "Color", "unit_raw": "Units", "value": 7, "value_basis": "level detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "15", "phg_printed": "NA", "source_group": null, "sample_year": 2023, "page": 5, "notes": "Table 4; sample date 12/2023; mcl_printed is the SMCL column"},
+    {"id": "specific_conductance", "raw_name": "Specific Conductance", "unit_raw": "µS/cm", "value": 703, "value_basis": "level detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "1,600", "phg_printed": "NA", "source_group": null, "sample_year": 2023, "page": 5, "notes": "Table 4; sample date 12/2023; mcl_printed is the SMCL column"},
+    {"id": "sulfate", "raw_name": "Sulfate", "unit_raw": "mg/L", "value": 52, "value_basis": "level detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "500", "phg_printed": "NA", "source_group": null, "sample_year": 2023, "page": 5, "notes": "Table 4; sample date 12/2023; mcl_printed is the SMCL column"},
+    {"id": "tds", "raw_name": "Total Dissolved Solids [TDS]", "unit_raw": "mg/L", "value": 398, "value_basis": "level detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "1,000", "phg_printed": "NA", "source_group": null, "sample_year": 2023, "page": 5, "notes": "Table 4; sample date 12/2023; mcl_printed is the SMCL column"},
+    {"id": "turbidity", "raw_name": "Turbidity", "unit_raw": "Units", "value": 0.15, "value_basis": "level detected", "average": null, "range_low": null, "range_high": null, "detected": true, "mcl_printed": "5", "phg_printed": "NA", "source_group": null, "sample_year": 2023, "page": 5, "notes": "Table 4; sample date 12/2023; unit printed 'Units'; mcl_printed is the SMCL column"}
+  ],
+  "violations": [],
+  "extraction_notes": "Text PDF; pages verified from pdftotext form feeds (Tables 1-2 on page 3, Table 3 on page 4, Tables 3A and 4 on page 5). Fluoride unit is printed as µg/L (almost certainly mg/L). Perchlorate and chlorine 'Level Detected' values are printed in parentheses, which the column header defines as averages. The report has no coliform table, no unregulated-contaminant table and no violation table; nothing is asterisked."
+}

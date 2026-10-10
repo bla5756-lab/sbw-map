@@ -10,10 +10,8 @@ from pathlib import Path
 
 import yaml
 
-MASS_UNITS = {  # factor to ppb (ug/L)
-    "ppt": 1e-3, "ng/l": 1e-3, "ppb": 1.0, "ug/l": 1.0, "µg/l": 1.0, "μg/l": 1.0, "mcg/l": 1.0,
-    "ppm": 1e3, "mg/l": 1e3,
-}
+MASS_UNITS = {"ppt": 1e-3, "ppb": 1.0, "ppm": 1e3}  # factor to ppb (ug/L)
+MASS_SYNONYMS = {"ng/l": "ppt", "ppt": "ppt", "ug/l": "ppb", "µg/l": "ppb", "mcg/l": "ppb", "ppb": "ppb", "mg/l": "ppm", "ppm": "ppm"}
 ALIAS_UNITS = {
     "micromhos/cm": "us/cm", "micromho/cm": "us/cm", "microsiemens/cm": "us/cm", "mmhos/cm": "us/cm",
     "umhos/cm": "us/cm", "µmhos/cm": "us/cm", "μmhos/cm": "us/cm", "umho/cm": "us/cm", "µs/cm": "us/cm",
@@ -68,8 +66,8 @@ def normalize_unit(unit_raw: str | None, analyte_id: str | None = None) -> str |
     u = re.sub(r"\s+", " ", u)
     if "no3" in u:
         return "ppm as no3" if u.startswith(("ppm", "mg")) else u
-    if u in MASS_UNITS:
-        return u
+    if u in MASS_SYNONYMS:
+        return MASS_SYNONYMS[u]
     if u in ALIAS_UNITS:
         return ALIAS_UNITS[u]
     if re.search(r"mho|µs/cm|us/cm|µs|microsiemens", u):

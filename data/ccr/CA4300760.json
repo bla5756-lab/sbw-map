@@ -1,0 +1,39 @@
+{
+  "pwsid": "CA4300760",
+  "system_name": "SANTA TERESA MEADOWS WATER COMPANY",
+  "status": "found",
+  "report": {
+    "data_year": 2024,
+    "title": "2024 Consumer Confidence Report - Santa Teresa MWC",
+    "url": "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300760&Year=2025&isCert=false",
+    "file": "reports/CA4300760/ccr-2024.pdf",
+    "format": "pdf",
+    "sha256": "926aef9252b92fde2d97be66275128af84bc3273fce128da94077b8c1332540f",
+    "pages": 7,
+    "retrieved": "2026-10-10"
+  },
+  "sources_described": "Ground Water: Well 01, 9823 Lantz Dr., Morgan Hill. Drinking water source assessment field left blank.",
+  "search_log": [
+    "WebSearch \"Santa Teresa Meadows Water Company\" Coyote consumer confidence report -> nothing for this system",
+    "No system website found",
+    "Drinking Water Watch https://sdwis.waterboards.ca.gov/PDWW/JSP/WaterSystemDetail.jsp?tinwsys_is_number=4253&tinwsys_st_code=CA -> Consumer Confidence Reports tab: 2025 Report + Certification links, 2024 'Report Not Available', 2023 Report link",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300760&Year=2025&isCert=false -> 7-page PDF that is actually the '2024 Consumer Confidence Report' (report date 6/16/25, monitoring period Jan 1 - Dec 31, 2024) -> used as the latest available; data_year recorded as 2024",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300760&Year=2024&isCert=false -> HTTP error (no file)",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300760&Year=2023&isCert=false -> '2023 Consumer Confidence Report' (report date 6/24/24) - older, not used"
+  ],
+  "analytes": [
+    {"id": "e_coli", "raw_name": "E. coli (In the year)", "unit_raw": null, "value": 0, "value_basis": "highest number of detections", "average": null, "range_low": null, "range_high": null, "detected": false, "mcl_printed": "(a)", "phg_printed": "0", "source_group": null, "sample_year": 2024, "page": 4, "notes": "Table 1: Highest No. of Detections 0, No. of Months in Violation 0; MCLG column printed as PHG"},
+    {"id": "lead", "raw_name": "Lead", "unit_raw": "ppb", "value": 0, "value_basis": "90th percentile", "average": null, "range_low": 0, "range_high": 0, "detected": false, "mcl_printed": "15", "phg_printed": "0.2", "source_group": null, "sample_year": 2022, "page": 4, "notes": "Table 2: sample dates 8/15/22 & 8/18/22; 5 samples; 90th percentile printed as 0; 0 sites exceeding AL; Range of Results printed as 0; mcl_printed is the AL"},
+    {"id": "copper", "raw_name": "Copper", "unit_raw": "ppm", "value": 0.32, "value_basis": "90th percentile", "average": null, "range_low": 0.095, "range_high": 0.43, "detected": true, "mcl_printed": "1.3", "phg_printed": "0.3", "source_group": null, "sample_year": 2022, "page": 4, "notes": "Table 2: sample dates 8/15/22 & 8/18/22; 5 samples; 0 sites exceeding AL; Range 0.095 - 0.43; mcl_printed is the AL"},
+    {"id": "sodium", "raw_name": "Sodium", "unit_raw": "ppm", "value": 35, "value_basis": "level detected", "average": null, "range_low": 35, "range_high": 35, "detected": true, "mcl_printed": "None", "phg_printed": "None", "source_group": null, "sample_year": 2025, "page": 4, "notes": "Table 3: sample date 2/27/25 (after the stated 2024 monitoring period); Range of Detections printed as 35"},
+    {"id": "hardness", "raw_name": "Hardness", "unit_raw": "ppm", "value": 330, "value_basis": "level detected", "average": null, "range_low": 330, "range_high": 330, "detected": true, "mcl_printed": "None", "phg_printed": "None", "source_group": null, "sample_year": 2025, "page": 4, "notes": "Table 3: sample date 2/27/25; Range of Detections printed as 330"},
+    {"id": "nitrate_n", "raw_name": "Nitrate", "unit_raw": "mg/L", "value": 5.5, "value_basis": "level detected", "average": null, "range_low": 5.5, "range_high": 5.5, "detected": true, "mcl_printed": "10", "phg_printed": "0", "source_group": null, "sample_year": 2024, "page": 5, "notes": "Table 4: sample date 5/30/24; Range printed as 5.5; printed as 'Nitrate mg/L' with MCL 10, i.e. as nitrogen; PHG printed as 0 (the California PHG for nitrate as N is 10 - copied as printed)"},
+    {"id": "chromium_6", "raw_name": "Chromium,Hex", "unit_raw": "ug/L", "value": 1.5, "value_basis": "level detected", "average": null, "range_low": 0.0015, "range_high": 0.0015, "detected": true, "mcl_printed": "10", "phg_printed": "0.02", "source_group": null, "sample_year": 2024, "page": 5, "notes": "Table 4: sample date 10/31/24; Range of Detections printed as 0.0015 (apparently the same result expressed in mg/L) - copied as printed"},
+    {"id": "perchlorate", "raw_name": "Perchlorate", "unit_raw": "ug/L", "value": 0, "value_basis": "level detected", "average": null, "range_low": 0, "range_high": 0, "detected": false, "mcl_printed": "6", "phg_printed": "1", "source_group": null, "sample_year": 2024, "page": 5, "notes": "Table 4: sample date 5/30/24; Level Detected and Range both printed as 0"},
+    {"id": "barium", "raw_name": "Barium", "unit_raw": "mg/L", "value": 0.1, "value_basis": "level detected", "average": null, "range_low": 0.1, "range_high": 0.1, "detected": true, "mcl_printed": "1", "phg_printed": "2", "source_group": null, "sample_year": 2023, "page": 5, "notes": "Table 4: sample date 5/24/23"},
+    {"id": "fluoride", "raw_name": "Fluoride", "unit_raw": "mg/L", "value": 0.14, "value_basis": "level detected", "average": null, "range_low": 0.14, "range_high": 0.14, "detected": true, "mcl_printed": "2", "phg_printed": "2", "source_group": null, "sample_year": 2023, "page": 5, "notes": "Table 4: sample date 5/24/23; PHG printed as 2 (California PHG is 1) - copied as printed"},
+    {"id": "tthm", "raw_name": "Total Trihalomethanes", "unit_raw": "ug/L", "value": 3.5, "value_basis": "level detected", "average": null, "range_low": 3.5, "range_high": 3.5, "detected": true, "mcl_printed": "80", "phg_printed": "N/A", "source_group": null, "sample_year": 2023, "page": 5, "notes": "Table 4: sample date 5/24/23"}
+  ],
+  "violations": [],
+  "extraction_notes": "Latest report on the State EAR portal is the 2024 CCR (dated 6/16/25) even though it sits in the portal's 2025 slot; no report covering 2025 data was found, so data_year is 2024. State SWS CCR template, 7 pages: Table 5 (secondary) and Table 6 (unregulated) are empty; Table 7 (violations) is printed 'NONE'; several template placeholders ('[Enter Additional Information ...]') were left unfilled. Single-result rows print the same number under Level Detected and Range of Detections; range_low/range_high copy that. Some printed PHGs (nitrate 0, fluoride 2) differ from current California PHGs and were copied as printed."
+}

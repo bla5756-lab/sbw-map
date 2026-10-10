@@ -1,0 +1,19 @@
+{
+  "pwsid": "CA4300522",
+  "system_name": "LAKE CANYON MUTUAL WATER COMPANY",
+  "status": "not_found",
+  "report": null,
+  "sources_described": null,
+  "search_log": [
+    "WebSearch: \"Lake Canyon Mutual Water\" Los Gatos \"consumer confidence report\" OR \"water quality report\" -> no relevant result (hits were Redwood Lodge Water Co. CPUC CCRs and unrelated systems)",
+    "https://sdwis.waterboards.ca.gov/PDWW/JSP/SearchDispatch (POST number=CA4300522) -> system found: tinwsys_is_number=4189, 19605 Manzanita Drive, Los Gatos CA 95033; surface water (SW), treatment class T2; 'No web address provided'",
+    "https://sdwis.waterboards.ca.gov/PDWW/JSP/CCR.jsp?tinwsys_is_number=4189&tinwsys_st_code=CA&Year=2025 -> 'Report Not Available' / 'Certification Not Available'",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300522&Year=2025&isCert=false -> HTTP 404; Year=2024 -> 404; Year=2023 -> 404; Year=2022 -> 404",
+    "https://ear.waterboards.ca.gov/Home/ViewCCR?PwsID=CA4300522&Year=2021&isCert=false and Year=2020 -> HTTP 200 application/pdf (CCRs exist on the EAR portal only for data years 2021 and 2020, older than the 2023 cutoff; not downloaded)",
+    "Santa Clara County DEH small-water-systems pages: https://deh.santaclaracounty.gov/ -> HTTP 403; deh.sccgov.org / cep.santaclaracounty.gov -> no response; searches for the county program returned only other counties",
+    "No system website exists as far as web search and Drinking Water Watch show"
+  ],
+  "analytes": [],
+  "violations": [],
+  "extraction_notes": "Nothing published for 2025, 2024 or 2023. The State EAR portal does hold uploads for data years 2021 and 2020 (ViewCCR?PwsID=CA4300522&Year=2021 / 2020) if an older report is ever acceptable."
+}

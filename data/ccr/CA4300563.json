@@ -1,0 +1,19 @@
+{
+  "pwsid": "CA4300563",
+  "system_name": "MT. PLEASANT WATER USERS ASSOCIATION",
+  "status": "not_found",
+  "report": null,
+  "sources_described": null,
+  "search_log": [
+    "WebSearch '\"Mt. Pleasant Water Users Association\" San Jose consumer confidence report' -> only San Jose Water and SJSU results; nothing for the association",
+    "WebSearch '\"Mt. Pleasant\" water \"Higuera Road\" San Jose mutual water association' -> nothing relevant",
+    "WebSearch '\"Mt. Pleasant Water Users\" OR \"Mount Pleasant Water Users Association\" San Jose California' -> nothing relevant",
+    "Domain probe https://mtpleasantwater.org/ -> no such host",
+    "Drinking Water Watch https://sdwis.waterboards.ca.gov/PDWW/JSP/WaterSystemDetail.jsp?tinwsys_is_number=4201&tinwsys_st_code=CA -> active, 300 served, 3855 Higuera Road San Jose, purchases all water from San Jose Water (CA4310011) via SJWC connection, no treatment plants, 'No web address provided'; CCR.jsp pages for 2023-2025 contain no report link",
+    "Santa Clara County DEH: system is regulated by State DDW District 17 per DWW; no county CCR repository found",
+    "San Jose Water's 2025 CCR (https://www.sjwater.com/ccr) covers the wholesaler's system, not this consecutive system's own report"
+  ],
+  "analytes": [],
+  "violations": [],
+  "extraction_notes": "No published CCR located online within the effort cap. The system is a consecutive system buying all water from San Jose Water; its CCR, if produced, likely repeats San Jose Water data but is not posted online."
+}
