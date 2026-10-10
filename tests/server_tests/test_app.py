@@ -15,7 +15,7 @@ def client():
 
 def test_index_serves_app(client):
     r = client.get("/")
-    assert r.status_code == 200 and "South Bay Water Quality" in r.text and "/static/app.js" in r.text
+    assert r.status_code == 200 and "South Bay Water Quality" in r.text and "static/app.js" in r.text
 
 
 def test_static_assets(client):

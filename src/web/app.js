@@ -413,8 +413,8 @@ function openDetail(pwsid, fid) {
   let html = `<h2>${esc(displayName(sys))}</h2><p class="sub">${esc(sys.pwsid)} · ${esc(titleCase(sys.classification || ''))} · ${esc(titleCase(sys.city || ''))} · pop ${sys.population?.toLocaleString() ?? '—'} · ${sys.connections?.toLocaleString() ?? '—'} connections</p>${pill}`;
   html += '<div class="card"><h3>Consumer Confidence Report</h3>';
   if (r.status === 'found') {
-    html += `<div class="report-actions">${r.file ? `<a class="btn-primary" href="/${esc(r.file)}" target="_blank" rel="noopener">Open the ${esc(r.data_year ?? '')} report ${r.format === 'html' ? '' : '(PDF)'}</a>` : ''}${r.url ? `<a class="btn" href="${esc(r.url)}" target="_blank" rel="noopener">Original source</a>` : ''}</div>`;
-    html += `<div class="kv"><span>Title</span><span>${esc(r.title || '—')}</span><span>Data year</span><span>${esc(r.data_year ?? '—')}</span><span>Document</span><span>${r.file ? `<a href="/${esc(r.file)}" target="_blank" rel="noopener">open saved copy</a>` : '—'}${r.url ? ` · <a href="${esc(r.url)}" target="_blank" rel="noopener">source</a>` : ''}</span><span>Retrieved</span><span>${esc(r.retrieved || '—')}</span></div>`;
+    html += `<div class="report-actions">${r.file ? `<a class="btn-primary" href="${esc(r.file)}" target="_blank" rel="noopener">Open the ${esc(r.data_year ?? '')} report ${r.format === 'html' ? '' : '(PDF)'}</a>` : ''}${r.url ? `<a class="btn" href="${esc(r.url)}" target="_blank" rel="noopener">Original source</a>` : ''}</div>`;
+    html += `<div class="kv"><span>Title</span><span>${esc(r.title || '—')}</span><span>Data year</span><span>${esc(r.data_year ?? '—')}</span><span>Document</span><span>${r.file ? `<a href="${esc(r.file)}" target="_blank" rel="noopener">open saved copy</a>` : '—'}${r.url ? ` · <a href="${esc(r.url)}" target="_blank" rel="noopener">source</a>` : ''}</span><span>Retrieved</span><span>${esc(r.retrieved || '—')}</span></div>`;
     if (r.sources_described) html += `<p class="clamp" data-clamp><b>Water sources:</b> ${esc(r.sources_described)}</p>`;
     if (r.violations?.length) html += '<p><b>Violations / exceedances disclosed:</b></p>' + r.violations.map((v) => `<div class="violation">${esc(v)}</div>`).join('');
     if (r.extraction_notes) html += `<details class="notes"><summary>Extraction notes</summary><p class="mono">${esc(r.extraction_notes)}</p></details>`;
@@ -580,8 +580,8 @@ async function boot() {
   $('#btn-theme').textContent = S.theme === 'dark' ? 'Light basemap' : 'Dark basemap';
   let site, geo;
   try {
-    [site, geo] = await Promise.all([fetch('/api/site').then((r) => { if (!r.ok) throw new Error(`site ${r.status}`); return r.json(); }),
-      fetch('/api/boundaries').then((r) => { if (!r.ok) throw new Error(`boundaries ${r.status}`); return r.json(); })]);
+    [site, geo] = await Promise.all([fetch('data/site.json').then((r) => { if (!r.ok) throw new Error(`site ${r.status}`); return r.json(); }),
+      fetch('data/site.geojson').then((r) => { if (!r.ok) throw new Error(`boundaries ${r.status}`); return r.json(); })]);
   } catch (err) {
     $('#loading').innerHTML = `<div class="err">Could not load data: ${esc(err.message)}. Run the pipeline and reload.</div>`;
     return;
@@ -627,7 +627,7 @@ function renderReports() {
   html += '<table class="vals"><thead><tr><th>Water system</th><th>Population</th><th>Report</th><th></th></tr></thead><tbody>';
   for (const s of found) {
     const r = s.report;
-    html += `<tr><td><b>${esc(displayName(s))}</b><div class="sub" style="margin:0">${esc(s.pwsid)}</div></td><td class="num">${s.population?.toLocaleString() ?? '—'}</td><td>${esc(r.data_year ?? '')} · ${esc((r.format || 'pdf').toUpperCase())}${r.pages ? ` · ${r.pages} pp` : ''}</td><td class="num">${r.file ? `<a class="btn-primary small-btn" href="/${esc(r.file)}" target="_blank" rel="noopener">Open</a>` : ''} ${r.url ? `<a class="link" href="${esc(r.url)}" target="_blank" rel="noopener">source</a>` : ''} <button class="link" data-detail="${esc(s.pwsid)}">map</button></td></tr>`;
+    html += `<tr><td><b>${esc(displayName(s))}</b><div class="sub" style="margin:0">${esc(s.pwsid)}</div></td><td class="num">${s.population?.toLocaleString() ?? '—'}</td><td>${esc(r.data_year ?? '')} · ${esc((r.format || 'pdf').toUpperCase())}${r.pages ? ` · ${r.pages} pp` : ''}</td><td class="num">${r.file ? `<a class="btn-primary small-btn" href="${esc(r.file)}" target="_blank" rel="noopener">Open</a>` : ''} ${r.url ? `<a class="link" href="${esc(r.url)}" target="_blank" rel="noopener">source</a>` : ''} <button class="link" data-detail="${esc(s.pwsid)}">map</button></td></tr>`;
   }
   html += '</tbody></table>';
   if (missing.length) html += `<details style="margin-top:12px"><summary class="sub">Community systems with no locatable report (${missing.length})</summary><ul class="search-log">${missing.map((s) => `<li>${esc(displayName(s))} (${esc(s.pwsid)}, pop ${s.population?.toLocaleString() ?? '—'})</li>`).join('')}</ul></details>`;

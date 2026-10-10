@@ -86,10 +86,11 @@ def create_app(cfg: dict | None = None) -> FastAPI:
         html = (web_dir / "index.html").read_text(encoding="utf-8")
         for name in ("app.js", "styles.css"):
             stamp = int((web_dir / name).stat().st_mtime)
-            html = html.replace(f"/static/{name}\"", f"/static/{name}?v={stamp}\"")
+            html = html.replace(f"static/{name}\"", f"static/{name}?v={stamp}\"")
         return Response(html, media_type="text/html", headers={"Cache-Control": "no-cache"})
 
     app.mount("/static", StaticFiles(directory=str(web_dir)), name="static")
+    app.mount("/data", StaticFiles(directory=str(data_dir)), name="data")
     return app
 
 

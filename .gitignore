@@ -8,3 +8,4 @@ tests/web_tests/screenshots/
 *.log
 data/site.json
 data/site.geojson
+site/
