@@ -144,8 +144,8 @@ def test_nearest_rank_percentile():
 
 
 @pytest.mark.parametrize("ftype, cls", [
-    ("DS", "distribution"), ("TP", "distribution"), ("CC", "distribution"), ("SS", "distribution"),
-    ("WL", "source"), ("IN", "source"), ("SP", "source"), ("CH", "source"), ("OT", "source"),
+    ("DS", "distribution"), ("TP", "distribution"), ("SS", "distribution"),
+    ("WL", "source"), ("IN", "source"), ("SP", "source"), ("CH", "source"), ("OT", "source"), ("CC", "source"),
     ("", "source"), ("ZZ", "source"), (" ds ", "distribution"),
 ])
 def test_point_class(ftype, cls):
@@ -255,7 +255,7 @@ def test_aggregation(inputs: dict):
 
 
 def test_by_class_split(inputs: dict):
-    """Each analyte carries the same statistics split into distribution (DS/TP/CC/SS) and source rows."""
+    """Each analyte carries the same statistics split into distribution (DS/TP/SS) and source rows."""
     doc = run(inputs)
     one = doc["systems"]["CA4300001"]["analytes"]
     ars = one["arsenic"]["by_class"]

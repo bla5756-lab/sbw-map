@@ -157,3 +157,19 @@ def test_theme_switch_rebuilds_layers(page):
     page.click("#btn-theme")
     page.wait_for_function("window.__sbw.ready === true", timeout=40000)
     assert not page.errors, page.errors
+
+
+def test_lab_mode_prefers_distribution_samples_and_offers_raw_toggle(page):
+    page.click(".seg-btn[data-source=lab]")
+    page.wait_for_timeout(500)
+    assert not page.locator("#lab-options").evaluate("e => e.classList.contains('hidden')")
+    assert "distribution" in page.text_content("#legend-note")
+    before = _counts(page)
+    page.click("label#lab-options .switch")
+    page.wait_for_timeout(500)
+    assert "all sampling points" in page.text_content("#legend-note")
+    assert _counts(page)["red"] == before["red"]
+    page.click("label#lab-options .switch")
+    page.click(".seg-btn[data-source=ccr]")
+    page.wait_for_timeout(300)
+    assert page.locator("#lab-options").evaluate("e => e.classList.contains('hidden')")

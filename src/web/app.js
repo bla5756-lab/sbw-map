@@ -102,9 +102,13 @@ function scoreSystem(sys) {
   const lab = sys.lab;
   if (!lab || !Object.keys(lab).length) return { kind: 'no_report', items: [] };
   if (!ids.length) return { kind: 'none', items: [] };
-  const items = ids.map((id) => lab[id] && { id, ...lab[id], value: lab[id].basis_value ?? lab[id].max ?? lab[id].latest }).filter(Boolean);
+  const items = ids.map((id) => {
+    const v = lab[id]; if (!v) return null;
+    if (S.labAllPoints || !v.classes || !Object.keys(v.classes).length) return { id, ...v, value: v.basis_value ?? v.max ?? v.latest, cls: 'all', detected: !!v.n_detected };
+    return { id, ...v, value: v.map_value, ratio: v.map_ratio, cls: v.map_class, detected: v.map_detected };
+  }).filter(Boolean);
   if (!items.length) return { kind: 'not_in_report', items: [] };
-  return finish(items, items.every((it) => !it.n_detected));
+  return finish(items, items.every((it) => !it.detected));
 }
 function finish(items, allNd) {
   let ratio = null;
@@ -389,10 +393,10 @@ function renderTooltip(sys) {
   html += statusText(sys, sc);
   for (const it of sc.items.slice(0, 7)) {
     const a = analyte(it.id);
-    const detected = S.source === 'ccr' ? it.status !== 'nd' : !!it.n_detected;
+    const detected = S.source === 'ccr' ? it.status !== 'nd' : (it.detected ?? !!it.n_detected);
     const val = detected ? `${fmt(it.value)} ${a.unit}` : 'ND';
     const col = detected ? rampColor(it.ratio) : KIND_COLOR.nd;
-    const hint = S.source === 'ccr' && detected && it.basis_tier === 2 ? ' (worst single result)' : '';
+    const hint = S.source === 'ccr' ? (detected && it.basis_tier === 2 ? ' (worst single result)' : '') : (it.cls === 'source' ? ' (source wells)' : it.cls === 'distribution' ? ' (distribution)' : ' (all points)');
     html += `<div class="tt-row"><span>${esc(a.name)}<span class="sub" style="display:inline;margin:0">${hint}</span></span><span class="num" style="color:${col}">${val}${detected && it.ratio != null && a.threshold_type !== 'NONE' ? ` · ${pct(it.ratio)}` : ''}</span></div>`;
   }
   if (sc.items.length > 7) html += `<div class="sub">+${sc.items.length - 7} more</div>`;
@@ -477,7 +481,9 @@ function renderLabTable(sys) {
       const det = !!v.n_detected;
       const bar = det && v.ratio != null && a.threshold_type !== 'NONE' ? `<div class="bar"><i style="width:${Math.min(100, v.ratio * 100)}%;background:${rampColor(v.ratio)}"></i></div>` : '';
       const lc = a.group === 'lead_copper' && v.p90 != null;
-      html += `<tr><td><b>${esc(a.name)}</b><div class="sub" style="margin:0">${esc(stdLabel(a))}${lc ? ' · colored by 90th percentile of tap samples' : ''}</div></td><td class="num">${det ? `${lc ? `${fmt(v.p90)} ${a.unit} <span class="sub">p90</span><div class="sub" style="margin:0">max ${fmt(v.max)}</div>` : `${fmt(v.max)} ${a.unit}`}` : 'ND'}${bar}</td><td class="num">${v.latest != null ? `${fmt(v.latest)} ${a.unit}` : 'ND'}<div class="sub" style="margin:0">${esc(v.latest_date || '')}</div></td><td class="num">${v.n_detected ?? 0}/${v.n ?? 0}${v.sampling_points ? `<div class="sub" style="margin:0">${v.sampling_points} pts</div>` : ''}</td></tr>`;
+      const cls = v.classes || {};
+      const clsLine = Object.keys(cls).length ? `<div class="sub" style="margin:2px 0 0">${['distribution', 'source'].filter((k) => cls[k]).map((k) => `${k}: ${cls[k].n_detected ? fmt(cls[k].basis_value) + ' ' + a.unit : 'ND'} (${cls[k].n_detected}/${cls[k].n})`).join(' · ')}</div>` : '';
+      html += `<tr><td><b>${esc(a.name)}</b><div class="sub" style="margin:0">${esc(stdLabel(a))}${lc ? ' · colored by 90th percentile of tap samples' : ''}</div>${clsLine}</td><td class="num">${det ? `${lc ? `${fmt(v.p90)} ${a.unit} <span class="sub">p90</span><div class="sub" style="margin:0">max ${fmt(v.max)}</div>` : `${fmt(v.max)} ${a.unit}`}` : 'ND'}${bar}</td><td class="num">${v.latest != null ? `${fmt(v.latest)} ${a.unit}` : 'ND'}<div class="sub" style="margin:0">${esc(v.latest_date || '')}</div></td><td class="num">${v.n_detected ?? 0}/${v.n ?? 0}${v.sampling_points ? `<div class="sub" style="margin:0">${v.sampling_points} pts</div>` : ''}</td></tr>`;
     }
     html += '</tbody></table></div>';
   }
@@ -537,7 +543,7 @@ function renderLegend() {
   if (a && a.threshold_type === 'NONE') { t.textContent = `${a.name}: relative to the highest system (no standard)`; note.textContent = 'No California standard exists for this analyte; 100% = the highest value on the map.'; }
   else if (a && a.threshold_type === 'RANGE') { t.textContent = `${a.name}: distance outside ${a.threshold_low}–${a.threshold}`; note.textContent = 'Inside the recommended range reads 0; 100% = one full range-width outside it.'; }
   else if (a) { t.textContent = `${a.name} as % of ${a.threshold_type} (${fmt(a.threshold)} ${a.unit})`; note.textContent = a.notes || ''; }
-  else { t.textContent = 'Worst fraction of standard among enabled analytes'; note.textContent = S.source === 'lab' ? 'Lab values are the maximum across all sampling points, including untreated sources.' : ''; }
+  else { t.textContent = 'Worst fraction of standard among enabled analytes'; note.textContent = S.source === 'lab' ? (S.labAllPoints ? 'Lab values are the maximum across all sampling points, including untreated source wells.' : 'Lab values use distribution-system samples when a system has them, otherwise its source wells.') : ''; }
 }
 
 /* ---------- state persistence ---------- */
@@ -561,6 +567,7 @@ function setSource(src) {
   document.querySelectorAll('.seg-btn').forEach((b) => { const on = b.dataset.source === src; b.classList.toggle('active', on); b.setAttribute('aria-selected', on); });
   $('#stats .stat:nth-child(2) .lbl').textContent = src === 'ccr' ? 'not in report' : 'not sampled';
   $('#stats .stat:nth-child(3) .lbl').textContent = src === 'ccr' ? 'no report' : 'no lab data';
+  $('#lab-options').classList.toggle('hidden', src !== 'lab');
   renderSidebar(); recolor();
 }
 
@@ -597,6 +604,7 @@ async function boot() {
   $('#solo-exit').addEventListener('click', () => { S.solo = null; renderSidebar(); recolor(); });
   $('#toggle-noncommunity').checked = S.showNonCommunity;
   $('#toggle-noncommunity').addEventListener('change', (e) => { S.showNonCommunity = e.target.checked; recolor(); });
+  $('#toggle-labpoints').addEventListener('change', (e) => { S.labAllPoints = e.target.checked; recolor(); });
   $('#toggle-labels').addEventListener('change', (e) => { S.showLabels = e.target.checked; if (S.svg) { S.svg.apply(); return; } for (const id of ['sys-label-big', 'sys-label-small']) if (S.map.getLayer(id)) S.map.setLayoutProperty(id, 'visibility', S.showLabels ? 'visible' : 'none'); });
   $('#btn-reports').addEventListener('click', () => { renderReports(); $('#reports').classList.remove('hidden'); });
   $('#reports .modal-close').addEventListener('click', () => $('#reports').classList.add('hidden'));

@@ -164,6 +164,20 @@ def merge_ccr(systems: dict, cat: dict, ccr_dir: Path) -> list[str]:
     return warnings
 
 
+def _lab_agg(a: dict, aid: str, agg: dict, unit: str | None) -> dict:
+    """Convert one SDWIS aggregate (all points, or one sampling-point class) to catalogue units."""
+    latest = convert(agg.get("latest_value"), unit, a["unit"], aid)
+    mx = convert(agg.get("max"), unit, a["unit"], aid)
+    p90 = convert(agg.get("p90"), unit, a["unit"], aid)
+    basis_val, basis = (p90, "p90") if (a["group"] == "lead_copper" and p90 is not None) else (mx, "max")
+    return {
+        "status": "value" if (latest is not None or mx is not None) else "nd",
+        "latest": latest, "max": mx, "p90": p90, "p90_n": agg.get("p90_n"), "basis_value": basis_val, "basis": basis,
+        "unit": a["unit"], "n": agg.get("n"), "n_detected": agg.get("n_detected"), "latest_date": agg.get("latest_date"),
+        "sampling_points": agg.get("sampling_points"), "raw_name": agg.get("raw_name"),
+    }
+
+
 def attach_sdwis(systems: dict, cat: dict, sdwis_path: Path) -> dict | None:
     """Attach per-system state lab aggregates when data/sdwis/santa_clara_results.json exists."""
     if not sdwis_path.exists():
@@ -186,14 +200,18 @@ def attach_sdwis(systems: dict, cat: dict, sdwis_path: Path) -> dict | None:
             prev = lab.get(aid)
             if prev and (mx is None or (prev.get("max") or 0) >= (mx or 0)):
                 continue
-            p90 = convert(agg.get("p90"), unit, a["unit"], aid)
-            basis_val, basis = (p90, "p90") if (a["group"] == "lead_copper" and p90 is not None) else (mx, "max")
-            lab[aid] = {
-                "status": "value" if (latest is not None or mx is not None) else "nd",
-                "latest": latest, "max": mx, "p90": p90, "p90_n": agg.get("p90_n"), "basis_value": basis_val, "basis": basis,
-                "unit": a["unit"], "n": agg.get("n"), "n_detected": agg.get("n_detected"), "latest_date": agg.get("latest_date"),
-                "sampling_points": agg.get("sampling_points"), "raw_name": agg.get("raw_name"),
-            }
+            lab[aid] = _lab_agg(a, aid, agg, unit)
+            classes = {}
+            for cls in ("distribution", "source"):
+                sub = (agg.get("by_class") or {}).get(cls)
+                if sub and sub.get("n"):
+                    classes[cls] = _lab_agg(a, aid, sub, unit)
+            lab[aid]["classes"] = classes
+            # the figure the map uses: distribution-system samples when they exist, else source wells, else all points
+            pick = classes.get("distribution") or classes.get("source")
+            lab[aid]["map_class"] = "distribution" if "distribution" in classes else ("source" if "source" in classes else "all")
+            lab[aid]["map_value"] = (pick or lab[aid])["basis_value"]
+            lab[aid]["map_detected"] = bool((pick or lab[aid])["n_detected"])
         sysrec["lab"] = lab
         sysrec["lab_meta"] = {"n_rows": rec.get("n_rows"), "latest_sample": rec.get("latest_sample")}
     return doc.get("source")
@@ -213,6 +231,10 @@ def compute_ratios(systems: dict, cat: dict) -> None:
             if lv:
                 basis = lv.get("basis_value") if lv.get("basis_value") is not None else (lv["max"] if lv["max"] is not None else lv["latest"])
                 lv["ratio"] = ratio_to_standard(a, basis, rel_max_lab) if basis is not None else 0.0
+                mv = lv.get("map_value")
+                lv["map_ratio"] = ratio_to_standard(a, mv, rel_max_lab) if mv is not None else 0.0
+                for cls in (lv.get("classes") or {}).values():
+                    cls["ratio"] = ratio_to_standard(a, cls["basis_value"], rel_max_lab) if cls["basis_value"] is not None else 0.0
 
 
 def build(repo_root: Path) -> tuple[dict, dict, list[str]]:

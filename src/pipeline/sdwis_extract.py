@@ -65,13 +65,15 @@ COL_LESS_THAN = "Less Than Reporting Level"  # Y = non-detect, N = detection
 COL_REPORTING_LEVEL = "Reporting Level"      # the laboratory's reporting level
 COL_DLR = "DLR"                              # state detection limit for purposes of reporting
 COL_MCL = "MCL"
-# Sampling-point classes for the per-analyte "by_class" split. "distribution" is water as served or
-# as it enters the system: DS distribution system (DBPR and LCR tap samples, distribution points),
-# TP treatment-plant sampling points (plant effluents / entry points in these rows), CC consecutive
-# connections (treated water purchased from a wholesaler, sampled at the turnout) and SS sampling
-# stations. Everything else is "source": WL wells, IN intakes, SP springs, CH common headers (raw
-# combined well water), OT other, and any code not listed here.
-DISTRIBUTION_FACILITY_TYPES = frozenset({"DS", "TP", "CC", "SS"})
+# Sampling-point classes for the per-analyte "by_class" split, decided on Facility Type alone.
+# "distribution" = water as served or as it enters the system: DS distribution system (DBPR and LCR
+# tap samples, distribution points), TP treatment-plant sampling points (plant effluents and points
+# of entry in these rows) and SS sampling stations (a treated-water reservoir here). Everything
+# else is "source": WL wells, IN intakes, SP springs, CH common headers (raw co-mingled well water),
+# OT other (intakes, influents, blend points), CC consecutive connections (the Santa Clara CC rows
+# are overwhelmingly a raw-water pipeline from the wholesaler, so CC is not treated as finished
+# water), and any code not listed here.
+DISTRIBUTION_FACILITY_TYPES = frozenset({"DS", "TP", "SS"})
 CLASS_DISTRIBUTION = "distribution"
 CLASS_SOURCE = "source"
 

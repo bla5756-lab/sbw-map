@@ -56,7 +56,17 @@ Outputs
   `latest_date`, or null when the latest sample was a non-detect. `p90` is the nearest-rank 90th
   percentile of the detected results (the value at rank ceil(0.9 x n) of the sorted detections),
   null when nothing was detected; `p90_n` is the number of detections it was computed from
-  (always equal to `n_detected`).
+  (always equal to `n_detected`). `by_class` splits the same statistics (`n`, `n_detected`,
+  `latest_date`, `latest_value`, `max`, `mean_detected`, `p90`, `p90_n`, `sampling_points`) by
+  sampling-point class, with only the classes that have rows present: `distribution` = Facility
+  Type DS (distribution system: DBPR and LCR tap samples), TP (treatment-plant sampling points,
+  which in these rows are plant effluents and points of entry) and SS (sampling station, a
+  treated-water reservoir here); `source` = everything else: WL wells, IN intakes, SP springs, CH
+  common headers (raw co-mingled well water), OT other (intakes, influents, a blend point) and CC
+  consecutive connections. CC is kept on the source side because 260 of the 265 Santa Clara CC rows
+  are the "SCVWD CROSS VALLEY PIPELINE (RAW WATER)" turnout; the five SFPUC treated-water rows at
+  Palo Alto are the price of deciding on Facility Type alone. The rule is
+  `DISTRIBUTION_FACILITY_TYPES` in the extractor.
 
 ## Columns
 
@@ -76,7 +86,7 @@ and counted in `rows_malformed` but not aggregated.
 | Principal County Served, Population Served, Service Connections | | - |
 | PS Code | `<PWSID>_<facility>_<sampling point>`; distribution points use `DST` | `sampling_points` (distinct codes) |
 | Sampling Point Name | e.g. `WELL 02`, `LCR Tap Sample`, `DBPR Sample` | - |
-| Facility Type | WL well, DS distribution, IN intake, TP treatment plant, SP spring, CC consecutive connection, OT other, SS sampling station, CH common header | `point_types` |
+| Facility Type | WL well, DS distribution, IN intake, TP treatment plant, SP spring, CC consecutive connection, OT other, SS sampling station, CH common header | `point_types`; `by_class` (DS/TP/SS -> distribution, rest -> source) |
 | Facility Status | | - |
 | Sample Type | not in the 12/2021 dictionary; every Santa Clara row is `RT` (routine); `SP` and `A` occur elsewhere | counted in `source.sample_types` |
 | Sample Date | `MM-DD-YYYY` in the files (the dictionary says `YYYY-MM-DD`; both are accepted) | dates |
@@ -167,7 +177,9 @@ Decisions worth knowing:
   be computed from the TSV (`Less Than Reporting Level`, `Sample Date`, `PS Code`).
 - Raw-water results dominate (81% of rows are wells and intakes). A well's result is not what
   customers drink: sources may be treated, blended or unused. The per-analyte `point_types`
-  tells how much of each aggregate is distribution (`DS`) versus source water.
+  tells how much of each aggregate is distribution (`DS`) versus source water, and `by_class`
+  gives the statistics for served water (`distribution`) and for source water separately; prefer
+  `by_class.distribution` when it exists for what customers receive.
 - `max` over three and a half years and all points is a conservative, not a representative,
   number; `mean_detected` ignores non-detects and so overstates typical levels for rarely
   detected analytes. TTHM/HAA5 compliance is a locational running annual average, not any of these.
