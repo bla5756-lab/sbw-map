@@ -60,7 +60,7 @@ def normalize_unit(unit_raw: str | None, analyte_id: str | None = None) -> str |
 
     Dimensionless analytes (pH) printed without a unit are accepted as their catalogue unit.
     """
-    if unit_raw is None or not str(unit_raw).strip():
+    if unit_raw is None or str(unit_raw).strip().lower() in ("", "-", "--", "—", "–", "n/a", "na", "none", "null"):
         return "ph" if analyte_id == "ph" else None
     u = str(unit_raw).strip().lower().replace("μ", "µ")
     u = re.sub(r"\s+", " ", u)
@@ -74,7 +74,9 @@ def normalize_unit(unit_raw: str | None, analyte_id: str | None = None) -> str |
         return "us/cm"
     if u in ("cu", "acu", "pcu", "pt-co", "pt/co", "color unit", "color units", "apparent color units", "units (color)"):
         return "units"
-    if u.startswith("ph") or u in ("unit", "std units", "s.u.", "su"):
+    if u in ("unit", "units"):
+        return "units"
+    if u.startswith("ph") or u in ("std units", "standard units", "s.u.", "su"):
         return "ph"
     if u in ("pci/l", "pc/l", "pci/liter"):
         return "pci/l"
@@ -99,7 +101,7 @@ def convert(value: float | None, unit_raw: str | None, target: str, analyte_id: 
         return None
     u = normalize_unit(unit_raw, analyte_id)
     t = target.lower()
-    generic = u is None or u in ("unit", "units", "su", "std units", "standard units", "none")
+    generic = u is None or u in ("units", "su", "std units", "standard units", "none")
     if generic and t in ("ph", "units", "ton", "ntu", "count"):
         return float(value)  # these are only ever printed in their own unit, or with none
     if u is None:

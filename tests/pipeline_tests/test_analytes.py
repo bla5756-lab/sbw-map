@@ -68,3 +68,11 @@ def test_ratio_mcl_and_none_and_range():
     assert ratio_to_standard(hardness, 50) is None
     ecoli = {"threshold_type": "MCL", "threshold": 0}
     assert ratio_to_standard(ecoli, 1) == 1.0 and ratio_to_standard(ecoli, 0) == 0.0
+
+
+@pytest.mark.parametrize("unit,target,aid,expected", [
+    ("-", "pH", "ph", 7.4), ("—", "pH", "ph", 7.4), ("Unit", "units", "color", 7.4), ("unit", "units", "color", 7.4),
+    ("units", "pH", "ph", 7.4), ("-", "ppm", "tds", None),
+])
+def test_dimensionless_and_dash_units(unit, target, aid, expected):
+    assert convert(7.4, unit, target, aid) == expected

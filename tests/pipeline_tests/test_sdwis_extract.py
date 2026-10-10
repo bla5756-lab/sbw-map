@@ -143,6 +143,15 @@ def test_nearest_rank_percentile():
     assert sx.nearest_rank_percentile([1.0, 2.0, 3.0], 100) == 3.0
 
 
+@pytest.mark.parametrize("ftype, cls", [
+    ("DS", "distribution"), ("TP", "distribution"), ("CC", "distribution"), ("SS", "distribution"),
+    ("WL", "source"), ("IN", "source"), ("SP", "source"), ("CH", "source"), ("OT", "source"),
+    ("", "source"), ("ZZ", "source"), (" ds ", "distribution"),
+])
+def test_point_class(ftype, cls):
+    assert sx.point_class(ftype) == cls
+
+
 def test_parse_sample_date():
     assert sx.parse_sample_date("09-03-2024") == "2024-09-03"
     assert sx.parse_sample_date("2024-09-03") == "2024-09-03"
@@ -243,6 +252,24 @@ def test_aggregation(inputs: dict):
     three = systems["CA4300003"]
     assert three == {"name": "THREE (no rows)", "n_rows": 0, "latest_sample": None, "sampling_points": 0,
                      "point_types": {}, "analytes": {}}
+
+
+def test_by_class_split(inputs: dict):
+    """Each analyte carries the same statistics split into distribution (DS/TP/CC/SS) and source rows."""
+    doc = run(inputs)
+    one = doc["systems"]["CA4300001"]["analytes"]
+    ars = one["arsenic"]["by_class"]
+    assert set(ars) == {"source", "distribution"}
+    assert ars["source"] == {"n": 2, "n_detected": 1, "latest_date": "2025-03-10", "latest_value": None,
+                             "max": 3.5, "mean_detected": 3.5, "p90": 3.5, "p90_n": 1, "sampling_points": 2}
+    assert ars["distribution"] == {"n": 1, "n_detected": 0, "latest_date": "2025-06-01", "latest_value": None,
+                                   "max": None, "mean_detected": None, "p90": None, "p90_n": 0, "sampling_points": 1}
+    # the split adds up to the top level and the top-level fields are unchanged
+    assert ars["source"]["n"] + ars["distribution"]["n"] == one["arsenic"]["n"] == 3
+    assert one["arsenic"]["max"] == 3.5 and one["arsenic"]["latest_date"] == "2025-06-01"
+    assert set(one["nitrate_n"]["by_class"]) == {"source"}             # wells only
+    lead = doc["systems"]["CA4300002"]["analytes"]["lead"]["by_class"]
+    assert set(lead) == {"distribution"} and lead["distribution"]["latest_value"] == 6.0
 
 
 def test_unit_label_override(inputs: dict, tmp_path: Path):

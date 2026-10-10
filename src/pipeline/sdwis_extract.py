@@ -65,6 +65,16 @@ COL_LESS_THAN = "Less Than Reporting Level"  # Y = non-detect, N = detection
 COL_REPORTING_LEVEL = "Reporting Level"      # the laboratory's reporting level
 COL_DLR = "DLR"                              # state detection limit for purposes of reporting
 COL_MCL = "MCL"
+# Sampling-point classes for the per-analyte "by_class" split. "distribution" is water as served or
+# as it enters the system: DS distribution system (DBPR and LCR tap samples, distribution points),
+# TP treatment-plant sampling points (plant effluents / entry points in these rows), CC consecutive
+# connections (treated water purchased from a wholesaler, sampled at the turnout) and SS sampling
+# stations. Everything else is "source": WL wells, IN intakes, SP springs, CH common headers (raw
+# combined well water), OT other, and any code not listed here.
+DISTRIBUTION_FACILITY_TYPES = frozenset({"DS", "TP", "CC", "SS"})
+CLASS_DISTRIBUTION = "distribution"
+CLASS_SOURCE = "source"
+
 REQUIRED_COLUMNS = (
     COL_PWSID, COL_SYSTEM_NAME, COL_PS_CODE, COL_FACILITY_TYPE, COL_SAMPLE_DATE, COL_ANALYTE_CODE,
     COL_ANALYTE_NAME, COL_RESULT, COL_UNIT, COL_LESS_THAN, COL_DLR,
@@ -148,6 +158,11 @@ def classify_result(result: str, less_than_flag: str, dlr: str) -> Classified:
     return Classified(value, True, "detected")
 
 
+def point_class(facility_type: str) -> str:
+    """'distribution' or 'source' for a Facility Type code (see DISTRIBUTION_FACILITY_TYPES)."""
+    return CLASS_DISTRIBUTION if facility_type.strip().upper() in DISTRIBUTION_FACILITY_TYPES else CLASS_SOURCE
+
+
 def read_tab(zip_path: Path) -> Iterator[tuple[zipfile.ZipInfo, str]]:
     """Yield (member, line) for every line of the single .tab member; line endings stripped.
 
@@ -215,42 +230,23 @@ def resolve_analyte(amap: dict, cat: dict, code: str, raw_name: str) -> tuple[st
 
 # ----------------------------------------------------------------------------- aggregation
 
-class Aggregate:
-    """One (system, analyte key) accumulator."""
+class Stats:
+    """Result statistics for a set of rows: the fields shared by an analyte and its class split."""
 
-    __slots__ = ("id", "n", "n_detected", "n_below_dlr", "sum", "max", "detected_values", "latest_date",
-                 "latest_values", "points", "point_types", "codes", "names", "units", "dlrs", "mcls")
+    __slots__ = ("n", "n_detected", "sum", "max", "detected_values", "latest_date", "latest_values", "points")
 
-    def __init__(self, analyte_id: str | None) -> None:
-        self.id = analyte_id
-        self.n = self.n_detected = self.n_below_dlr = 0
+    def __init__(self) -> None:
+        self.n = self.n_detected = 0
         self.sum = 0.0
         self.max: float | None = None
         self.detected_values: list[float] = []  # every detected result, for the 90th percentile
         self.latest_date: str | None = None
-        self.latest_values: list[float] = []
+        self.latest_values: list[float] = []    # detected results dated latest_date
         self.points: set[str] = set()
-        self.point_types: Counter = Counter()
-        self.codes: Counter = Counter()
-        self.names: dict[str, str] = {}
-        self.units: Counter = Counter()
-        self.dlrs: Counter = Counter()
-        self.mcls: Counter = Counter()
 
-    def add(self, c: Classified, date: str | None, ps_code: str, facility_type: str, code: str,
-            raw_name: str, unit: str, dlr: str, mcl: str) -> None:
+    def add(self, c: Classified, date: str | None, ps_code: str) -> None:
         self.n += 1
-        self.codes[code] += 1
-        self.names.setdefault(code, raw_name)
-        self.units[unit] += 1
-        if dlr:
-            self.dlrs[dlr] += 1
-        if mcl:
-            self.mcls[mcl] += 1
         self.points.add(ps_code)
-        self.point_types[facility_type or "?"] += 1
-        if c.kind == "below_dlr":
-            self.n_below_dlr += 1
         if c.detected:
             self.n_detected += 1
             self.sum += c.value
@@ -264,15 +260,9 @@ class Aggregate:
                 self.latest_values.append(c.value)
 
     def to_json(self) -> dict:
-        main_code = self.codes.most_common(1)[0][0]
-        out = {
-            "id": self.id,
-            "raw_name": self.names[main_code],
-            "storet": main_code,
-            "unit": self.units.most_common(1)[0][0],
+        return {
             "n": self.n,
             "n_detected": self.n_detected,
-            "n_below_dlr": self.n_below_dlr,
             "latest_date": self.latest_date,
             "latest_value": max(self.latest_values) if self.latest_values else None,
             "max": self.max,
@@ -282,9 +272,68 @@ class Aggregate:
             "p90": nearest_rank_percentile(self.detected_values, 90),
             "p90_n": len(self.detected_values),
             "sampling_points": len(self.points),
+        }
+
+
+class Aggregate:
+    """One (system, analyte key) accumulator: overall Stats, a per-class split, and row metadata."""
+
+    __slots__ = ("id", "total", "by_class", "n_below_dlr", "point_types", "codes", "names", "units", "dlrs", "mcls")
+
+    def __init__(self, analyte_id: str | None) -> None:
+        self.id = analyte_id
+        self.total = Stats()
+        self.by_class: dict[str, Stats] = {}
+        self.n_below_dlr = 0
+        self.point_types: Counter = Counter()
+        self.codes: Counter = Counter()
+        self.names: dict[str, str] = {}
+        self.units: Counter = Counter()
+        self.dlrs: Counter = Counter()
+        self.mcls: Counter = Counter()
+
+    def add(self, c: Classified, date: str | None, ps_code: str, facility_type: str, code: str,
+            raw_name: str, unit: str, dlr: str, mcl: str) -> None:
+        self.total.add(c, date, ps_code)
+        cls = point_class(facility_type)
+        sub = self.by_class.get(cls)
+        if sub is None:
+            sub = self.by_class[cls] = Stats()
+        sub.add(c, date, ps_code)
+        self.codes[code] += 1
+        self.names.setdefault(code, raw_name)
+        self.units[unit] += 1
+        if dlr:
+            self.dlrs[dlr] += 1
+        if mcl:
+            self.mcls[mcl] += 1
+        self.point_types[facility_type or "?"] += 1
+        if c.kind == "below_dlr":
+            self.n_below_dlr += 1
+
+    def to_json(self) -> dict:
+        main_code = self.codes.most_common(1)[0][0]
+        stats = self.total.to_json()
+        out = {
+            "id": self.id,
+            "raw_name": self.names[main_code],
+            "storet": main_code,
+            "unit": self.units.most_common(1)[0][0],
+            "n": stats["n"],
+            "n_detected": stats["n_detected"],
+            "n_below_dlr": self.n_below_dlr,
+            "latest_date": stats["latest_date"],
+            "latest_value": stats["latest_value"],
+            "max": stats["max"],
+            "mean_detected": stats["mean_detected"],
+            "p90": stats["p90"],
+            "p90_n": stats["p90_n"],
+            "sampling_points": stats["sampling_points"],
             "point_types": dict(sorted(self.point_types.items())),
             "dlr": self.dlrs.most_common(1)[0][0] if self.dlrs else None,
             "mcl": self.mcls.most_common(1)[0][0] if self.mcls else None,
+            # the same statistics split by sampling-point class; only classes with rows appear
+            "by_class": {cls: self.by_class[cls].to_json() for cls in sorted(self.by_class)},
         }
         if len(self.codes) > 1:
             out["other_storets"] = {c: self.names[c] for c in sorted(self.codes) if c != main_code}
