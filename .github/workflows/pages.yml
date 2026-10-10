@@ -25,6 +25,7 @@ jobs:
           python-version: "3.12"
       - run: pip install -q pyyaml fastapi httpx pytest
       - run: python -m compileall -q src tests
+      - run: python -m src.pipeline.build_site
       - run: python -m pytest tests/pipeline_tests tests/server_tests -q -p no:warnings
 
   build:
